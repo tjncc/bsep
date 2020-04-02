@@ -1,13 +1,13 @@
-package tim26.RentACar;
+package tim26.bezbednost;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RentACarApplication {
+public class BezbednostApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(RentACarApplication.class, args);
+		SpringApplication.run(BezbednostApplication.class, args);
 	}
 
 }

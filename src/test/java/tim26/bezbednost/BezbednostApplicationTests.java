@@ -1,10 +1,10 @@
-package tim26.RentACar;
+package tim26.bezbednost;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class RentACarApplicationTests {
+class BezbednostApplicationTests {
 
 	@Test
 	void contextLoads() {
