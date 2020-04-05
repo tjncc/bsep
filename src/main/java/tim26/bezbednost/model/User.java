@@ -1,5 +1,7 @@
 package tim26.bezbednost.model;
 
+import tim26.bezbednost.model.enumeration.UserRole;
+
 public class User {
 
     private String name;

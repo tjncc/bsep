@@ -21,7 +21,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 @Component
-public class CertificateGenerator {
+public class  CertificateGenerator {
 
     public CertificateGenerator() {
         Security.addProvider(new BouncyCastleProvider());

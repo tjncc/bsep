@@ -1,10 +1,9 @@
 package tim26.bezbednost.model;
 
-import org.apache.tomcat.jni.Local;
+import tim26.bezbednost.model.enumeration.CertificateRole;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Entity
 public class Certificate  implements Serializable {
