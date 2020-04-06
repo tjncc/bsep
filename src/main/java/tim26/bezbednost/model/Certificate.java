@@ -27,6 +27,7 @@ public class Certificate  implements Serializable {
         this.role = certificateRole;
     }
 
+
     public CertificateRole getRole() {
         return role;
     }
