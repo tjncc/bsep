@@ -59,26 +59,18 @@ public class CertificateService implements ICertificateService {
 
     public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
 
-        //keypair za subjekta i issuera je isti, jer je self-signed sertifikat
         SubjectData subject = generateSubjectData(certificateX509NameDto);
         IssuerData issuer = generateIssuerData(certificateX509NameDto, subject.getPrivateKey());
 
-        X509Certificate cert = certificateGenerator.generateCertificate(subject, issuer);
-        cert.verify(subject.getPublicKey());
+        X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
+        certificate.verify(subject.getPublicKey());
 
-        System.out.println("\n===== Certificate issuer=====");
-        System.out.println(cert.getIssuerX500Principal().getName());
-        System.out.println("\n===== Certicate owner =====");
-        System.out.println(cert.getSubjectX500Principal().getName());
-        System.out.println("\n===== Certificate =====");
-        System.out.println("-------------------------------------------------------");
-        System.out.println(cert);
-        System.out.println("-------------------------------------------------------");
+        String certificateIssuer = certificate.getIssuerX500Principal().getName();
+        String certificateOwner = certificate.getSubjectX500Principal().getName();
 
-        //save the cert in the keystore
-        keyStoreService.saveCertificate(cert, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
+        keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
 
-        //sacuvaj u bazu
+        //uraditi: sacuvaj u bazu
     }
 
 
