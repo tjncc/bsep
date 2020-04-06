@@ -1,5 +1,6 @@
 package tim26.bezbednost.model.certificates;
 
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Date;
 
@@ -12,17 +13,19 @@ public class SubjectData {
     private String serialNumber;
     private Date startDate;
     private Date endDate;
+    private PrivateKey privateKey;
 
     public SubjectData() {
 
     }
 
-    public SubjectData(PublicKey publicKey, X500Name x500name, String serialNumber, Date startDate, Date endDate) {
+    public SubjectData(PublicKey publicKey, X500Name x500name, String serialNumber, Date startDate, Date endDate, PrivateKey privateKey) {
         this.publicKey = publicKey;
         this.x500name = x500name;
         this.serialNumber = serialNumber;
         this.startDate = startDate;
         this.endDate = endDate;
+        this.privateKey = privateKey;
     }
 
     public X500Name getX500name() {
@@ -63,6 +66,14 @@ public class SubjectData {
 
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
+    }
+
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(PrivateKey privateKey) {
+        this.privateKey = privateKey;
     }
 }
 
