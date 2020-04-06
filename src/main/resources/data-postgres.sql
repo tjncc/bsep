@@ -1,0 +1,1 @@
+insert into user_entity (id, email, lastname, firstname, password, user_role, username) values (-1, 'admin@gmail.com', 'admin', 'admin', 'admin', 'SYSTEMADMIN', 'admin');
