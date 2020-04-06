@@ -22,6 +22,11 @@ public class Certificate  implements Serializable {
     public Certificate() {
     }
 
+    public Certificate(String serialNumber, CertificateRole certificateRole) {
+        this.serialNumber = serialNumber;
+        this.role = certificateRole;
+    }
+
     public CertificateRole getRole() {
         return role;
     }

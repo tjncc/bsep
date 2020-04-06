@@ -70,7 +70,9 @@ public class CertificateService implements ICertificateService {
 
         keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
 
-        //uraditi: sacuvaj u bazu
+        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT);
+
+        certificateRepository.save(certificate1);
     }
 
 
