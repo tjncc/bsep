@@ -82,8 +82,8 @@ public class CertificateService implements ICertificateService {
     public void generateCACertificate(CertificateX509NameDto certificateX509NameDto, String serialNumber) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
 
         SubjectData subject = generateSubjectData(certificateX509NameDto);
-        List<CertificateDto> list = findAll();
-        for(CertificateDto c : list) {
+        List<CertificateDto> certificateDtoList = findAll();
+        for(CertificateDto c : certificateDtoList) {
             if(c.getSerialNumber().equals(serialNumber)) {
                 if(c.getCertificateRole() == CertificateRole.ROOT) {
 
