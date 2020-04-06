@@ -2,17 +2,37 @@ package tim26.bezbednost.model;
 
 import tim26.bezbednost.model.enumeration.UserRole;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "user_entity")
 public class User {
 
-    private String name;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column
+    private String firstname;
+
+    @Column
     private String lastname;
+
+    @Column(unique = true, nullable = false)
     private String username;
+
+    @Column(unique = true, nullable = false)
     private String email;
+
+    @Column(nullable = false)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_role", nullable = false)
     private UserRole userRole;
 
-    public User(String name, String lastname, String username, String email, String password) {
-        this.name = name;
+    public User(String firstname, String lastname, String username, String email, String password) {
+        this.firstname = firstname;
         this.lastname = lastname;
         this.username = username;
         this.email = email;
@@ -23,12 +43,12 @@ public class User {
 
     }
 
-    public String getName() {
-        return name;
+    public String getFirstnameame() {
+        return firstname;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
     }
 
     public String getLastname() {
