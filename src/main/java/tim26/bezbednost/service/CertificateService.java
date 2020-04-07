@@ -2,6 +2,7 @@ package tim26.bezbednost.service;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import tim26.bezbednost.dto.CertificateDto;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
@@ -20,6 +21,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class CertificateService implements ICertificateService {
 
     @Autowired
@@ -66,13 +68,13 @@ public class CertificateService implements ICertificateService {
         SubjectData subject = generateSubjectData(certificateX509NameDto);
         IssuerData issuer = generateIssuerData(certificateX509NameDto, subject.getPrivateKey());
 
-        X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
+        X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true);
         certificate.verify(subject.getPublicKey());
 
         String certificateIssuer = certificate.getIssuerX500Principal().getName();
         String certificateOwner = certificate.getSubjectX500Principal().getName();
 
-        keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
+        keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
 
         Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT);
 
@@ -91,9 +93,9 @@ public class CertificateService implements ICertificateService {
                             c.getSerialNumber(), "root".toCharArray(),
                             "root".toCharArray());
 
-                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true);
 
-                    keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                    keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
                 }else {
 
@@ -102,9 +104,9 @@ public class CertificateService implements ICertificateService {
                             "intermediate".toCharArray(),
                             "intermediate".toCharArray());
 
-                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true);
 
-                    keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                    keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
                 }
             }

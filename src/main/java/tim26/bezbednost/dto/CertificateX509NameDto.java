@@ -1,6 +1,9 @@
 package tim26.bezbednost.dto;
 
 import tim26.bezbednost.model.enumeration.CertificateRole;
+import tim26.bezbednost.model.enumeration.CertificationType;
+
+import java.math.BigInteger;
 
 public class CertificateX509NameDto {
 
@@ -12,6 +15,8 @@ public class CertificateX509NameDto {
     private String organizationUnit;
     private String serialNumber;
     private CertificateRole certificateRole;
+    private BigInteger IssuerId;
+    private CertificationType subjectType;
 
     public CertificateX509NameDto() {
 
@@ -79,5 +84,21 @@ public class CertificateX509NameDto {
 
     public void setCertificateRole(CertificateRole certificateRole) {
         this.certificateRole = certificateRole;
+    }
+
+    public BigInteger getIssuerId() {
+        return IssuerId;
+    }
+
+    public void setIssuerId(BigInteger issuerId) {
+        IssuerId = issuerId;
+    }
+
+    public CertificationType getSubjectType() {
+        return subjectType;
+    }
+
+    public void setSubjectType(CertificationType subjectType) {
+        this.subjectType = subjectType;
     }
 }

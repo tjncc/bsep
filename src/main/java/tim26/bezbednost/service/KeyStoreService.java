@@ -1,6 +1,7 @@
 package tim26.bezbednost.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
 import tim26.bezbednost.keystore.KeyStoreWriter;
@@ -15,6 +16,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class KeyStoreService implements IKeyStoreService {
 
 
@@ -118,6 +120,12 @@ public class KeyStoreService implements IKeyStoreService {
     public void generateCAKeyStore(String alias, CertificateX509NameDto certificatedto){
 
 
+
+    }
+
+    public void generateEndEntituKeyStore(String alias, CertificateX509NameDto certificatedto){
+
+        keyStoreWriter.loadKeyStore(null, "end-entity".toCharArray());
 
     }
 
