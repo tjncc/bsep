@@ -19,6 +19,7 @@ import java.security.*;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 
 @Component
 public class  CertificateGenerator {
@@ -38,12 +39,12 @@ public class  CertificateGenerator {
 
             //Formira se objekat koji ce sadrzati privatni kljuc i koji ce se koristiti za potpisivanje sertifikata
             ContentSigner contentSigner = builder.build(issuerData.getPrivateKey());
-
+            
             //Postavljaju se podaci za generisanje sertifiakta
             X509v3CertificateBuilder certGen = new JcaX509v3CertificateBuilder(issuerData.getX500name(),
                     new BigInteger(subjectData.getSerialNumber()),
-                    subjectData.getStartDate(),
-                    subjectData.getEndDate(),
+                    java.sql.Date.valueOf(subjectData.getStartDate()),
+                    java.sql.Date.valueOf(subjectData.getEndDate()),
                     subjectData.getX500name(),
                     subjectData.getPublicKey());
             //Generise se sertifikat
