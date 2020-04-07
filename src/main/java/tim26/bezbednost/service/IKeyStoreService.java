@@ -4,6 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import tim26.bezbednost.model.enumeration.CertificateRole;
 
 import java.io.FileNotFoundException;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.List;
+
+import java.io.FileNotFoundException;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
