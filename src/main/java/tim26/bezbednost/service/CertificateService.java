@@ -19,6 +19,7 @@ import tim26.bezbednost.repository.KeyStoreRepository;
 
 import javax.management.relation.Role;
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -186,34 +187,80 @@ public class CertificateService implements ICertificateService {
 
         SubjectData subject = generateSubjectData(certificateX509NameDto);
         List<CertificateDto> certificateDtoList = findAll();
-        for(CertificateDto c : certificateDtoList) {
-            if(c.getSerialNumber().equals(serialNumber)) {
-                if(c.getCertificateRole() == CertificateRole.ROOT) {
+        for (CertificateDto c : certificateDtoList) {
+            if (c.getSerialNumber().equals(serialNumber)) {
+                if (c.getCertificateRole() == CertificateRole.ROOT) {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/root.jks",
                             c.getSerialNumber(), "root".toCharArray(),
                             "root".toCharArray());
 
-                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true);
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true);
 
                     keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
-                }else {
+                } else {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/intermediate.jks",
                             c.getSerialNumber(),
                             "intermediate".toCharArray(),
                             "intermediate".toCharArray());
 
-                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true);
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true);
 
                     keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
                 }
             }
         }
-
     }
+
+
+        public X509Certificate generateCertificateNotCA(CertificateX509NameDto certificatedto,String alias) throws FileNotFoundException {
+
+            SubjectData subject = generateSubjectData(certificatedto);
+            IssuerData issuer =  null;
+            X509Certificate returnc = null;
+
+            List<X509Certificate> certsRoots = keyStoreService.findKeyStoreCertificatesByRole(CertificateRole.ROOT);
+
+            for(X509Certificate c : certsRoots) {
+
+                if(c.getSerialNumber().equals(new BigInteger(alias))) {
+
+                    issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/root.jks",
+                            String.valueOf(c.getSerialNumber()), "root".toCharArray(),
+                            "root".toCharArray());
+
+                    returnc = certificateGenerator.generateCertificate(subject, issuer,false);
+                    keyStoreService.saveCertificateToKeyStore(returnc, certificatedto.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
+                    return  returnc;
+
+                }
+            }
+
+            List<X509Certificate> certsIntermediates = keyStoreService.findKeyStoreCertificatesByRole(CertificateRole.INTERMEDIATE);
+
+            for(X509Certificate c : certsRoots) {
+
+                if(c.getSerialNumber().equals(new BigInteger(alias))) {
+
+                    issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/intermediate.jks",
+                            String.valueOf(c.getSerialNumber()), "intermediate".toCharArray(),
+                            "intermediate".toCharArray());
+
+                    returnc = certificateGenerator.generateCertificate(subject, issuer,false);
+                    keyStoreService.saveCertificateToKeyStore(returnc, certificatedto.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
+                    return  returnc;
+
+                }
+            }
+
+            return  returnc;
+
+        }
+
+
 
 
 

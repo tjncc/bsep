@@ -15,7 +15,7 @@ public class CertificateX509NameDto {
     private String organizationUnit;
     private String serialNumber;
     private CertificateRole certificateRole;
-    private BigInteger IssuerId;
+    private String IssuerSerialNumber;
     private CertificationType subjectType;
 
     public CertificateX509NameDto() {
@@ -86,12 +86,12 @@ public class CertificateX509NameDto {
         this.certificateRole = certificateRole;
     }
 
-    public BigInteger getIssuerId() {
-        return IssuerId;
+    public String getIssuerId() {
+        return IssuerSerialNumber;
     }
 
-    public void setIssuerId(BigInteger issuerId) {
-        IssuerId = issuerId;
+    public void setIssuerId(String issuerSerialNumber) {
+        this.IssuerSerialNumber = issuerSerialNumber;
     }
 
     public CertificationType getSubjectType() {

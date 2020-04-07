@@ -6,7 +6,6 @@ import java.security.PublicKey;
 import java.util.Date;
 import java.time.LocalDate;
 
-import jdk.vm.ci.meta.Local;
 import org.bouncycastle.asn1.x500.X500Name;
 
 public class SubjectData {
@@ -48,11 +47,11 @@ public class SubjectData {
         this.publicKey = publicKey;
     }
 
-    public BigInteger getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(BigInteger serialNumber) {
+    public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 

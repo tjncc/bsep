@@ -5,9 +5,12 @@ import org.springframework.stereotype.Service;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
 import tim26.bezbednost.keystore.KeyStoreWriter;
+import tim26.bezbednost.model.certificates.IssuerData;
+import tim26.bezbednost.model.certificates.SubjectData;
 import tim26.bezbednost.model.enumeration.CertificateRole;
 
 import java.io.FileNotFoundException;
+import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -117,15 +120,18 @@ public class KeyStoreService implements IKeyStoreService {
 
     }
 
-    public void generateCAKeyStore(String alias, CertificateX509NameDto certificatedto){
+    public void generateIntermediateKeyStore(String alias, CertificateX509NameDto certificatedto){
 
 
 
     }
 
-    public void generateEndEntituKeyStore(String alias, CertificateX509NameDto certificatedto){
+    public void generateEndEntityKeyStore(String alias, CertificateX509NameDto certificatedto) throws FileNotFoundException {
 
         keyStoreWriter.loadKeyStore(null, "end-entity".toCharArray());
+        certificateService.generateCertificateNotCA(certificatedto,alias);
+        keyStoreWriter.saveKeyStore("../../../../../jks/end-entity.jks","end-entity".toCharArray());
+
 
     }
 
