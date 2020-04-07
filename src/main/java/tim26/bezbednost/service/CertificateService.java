@@ -66,7 +66,7 @@ public class CertificateService implements ICertificateService {
     @Override
     public CertificateX509NameDto[] getIssuerAndSubjectData(String serialNumber, CertificateRole certificateRole) throws FileNotFoundException {
 
-        List<X509Certificate> x509certificates = keyStoreService.findKeyStoreCertificates(certificateRole);
+        List<X509Certificate> x509certificates = keyStoreService.findKeyStoreCertificatesByRole(certificateRole);
 
         for(X509Certificate certificate : x509certificates){
 
@@ -87,9 +87,9 @@ public class CertificateService implements ICertificateService {
         KeyPair keyPair;
 
         if(certificateDto.getCertificateRole().equals(CertificateRole.ENDENTITY)){
-            keyPair = certificateG.generateKeyPair(false);
+            keyPair = certificateGenerator.generateKeyPair(false);
         } else {
-            keyPair = certificateG.generateKeyPair(true);
+            keyPair = certificateGenerator.generateKeyPair(true);
         }
 
         subjectData.setPublicKey(keyPair.getPublic());
@@ -125,7 +125,7 @@ public class CertificateService implements ICertificateService {
         // cn - common name
         nameBuilder.addRDN(BCStyle.CN, certificateDto.getCommonName());
         // L - location
-        nameBuilder.addRDN(BCStyle.L, certificateDto.getLocation());
+        //nameBuilder.addRDN(BCStyle.L, certificateDto.getLocation());
         // ID korisnika ?
 
         subjectData.setX500name(nameBuilder.build());
@@ -133,12 +133,34 @@ public class CertificateService implements ICertificateService {
         return subjectData;
     }
 
+    @Override
+    public IssuerData generateIssuerData(CertificateX509NameDto certificateDto, PrivateKey privateKey) {
 
+        IssuerData issuerData = new IssuerData();
+        issuerData.setPrivateKey(privateKey);
 
+        X500NameBuilder nameBuilder = new X500NameBuilder();
+        // o - organisation
+        nameBuilder.addRDN(BCStyle.O, certificateDto.getOrganization());
+        // e - email
+        nameBuilder.addRDN(BCStyle.E, certificateDto.getEmail());
+        // c - city
+        nameBuilder.addRDN(BCStyle.C, certificateDto.getCity());
+        // st - state
+        nameBuilder.addRDN(BCStyle.ST, certificateDto.getState());
+        // ou - organisation unit
+        nameBuilder.addRDN(BCStyle.OU, certificateDto.getOrganizationUnit());
+        // cn - common name
+        nameBuilder.addRDN(BCStyle.CN, certificateDto.getCommonName());
+        // L - location
+        //nameBuilder.addRDN(BCStyle.L, certificateDto.getLocation());
+        // ID korisnika ?
+        issuerData.setX500name(nameBuilder.build());
 
-    public IssuerData generateIssuerData(CertificateX509NameDto certificateX509NameDto, PrivateKey privateKey) {
-        return null;
+        return issuerData;
     }
+
+
 
     public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
 
@@ -151,7 +173,7 @@ public class CertificateService implements ICertificateService {
         String certificateIssuer = certificate.getIssuerX500Principal().getName();
         String certificateOwner = certificate.getSubjectX500Principal().getName();
 
-        keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
+        keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
 
         Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT);
 
@@ -172,7 +194,7 @@ public class CertificateService implements ICertificateService {
 
                     X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
 
-                    keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                    keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
                 }else {
 
@@ -183,7 +205,7 @@ public class CertificateService implements ICertificateService {
 
                     X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
 
-                    keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                    keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
                 }
             }
