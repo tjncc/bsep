@@ -7,18 +7,24 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import tim26.bezbednost.dto.CertificateDto;
 import tim26.bezbednost.dto.CertificateX509NameDto;
+import tim26.bezbednost.keystore.KeyStoreReader;
 import tim26.bezbednost.model.Certificate;
 import tim26.bezbednost.model.certificates.CertificateGenerator;
+import tim26.bezbednost.model.certificates.IssuerData;
 import tim26.bezbednost.model.certificates.SubjectData;
 import tim26.bezbednost.model.enumeration.CertificateRole;
 import tim26.bezbednost.repository.CertificateRepository;
+import tim26.bezbednost.repository.KeyStoreRepository;
 
 import javax.management.relation.Role;
 import java.io.FileNotFoundException;
 import java.security.KeyPair;
 import java.security.SecureRandom;
-import java.security.cert.X509Certificate;
 import java.time.LocalDate;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -29,13 +35,20 @@ public class CertificateService implements ICertificateService {
     private CertificateRepository certificateRepository;
 
     @Autowired
+    private KeyStoreReader keyStoreReader;
+
+    @Autowired
     private ModelMapper modelMapper;
 
     @Autowired
     private IKeyStoreService keyStoreService;
 
     @Autowired
-    private CertificateGenerator certificateG;
+    private KeyStoreRepository keyStoreRepository;
+
+    @Autowired
+    private CertificateGenerator certificateGenerator;
+
 
     @Override
     public List<CertificateDto> findAll() {
@@ -119,6 +132,66 @@ public class CertificateService implements ICertificateService {
 
         return subjectData;
     }
+
+
+
+
+    public IssuerData generateIssuerData(CertificateX509NameDto certificateX509NameDto, PrivateKey privateKey) {
+        return null;
+    }
+
+    public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
+
+        SubjectData subject = generateSubjectData(certificateX509NameDto);
+        IssuerData issuer = generateIssuerData(certificateX509NameDto, subject.getPrivateKey());
+
+        X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
+        certificate.verify(subject.getPublicKey());
+
+        String certificateIssuer = certificate.getIssuerX500Principal().getName();
+        String certificateOwner = certificate.getSubjectX500Principal().getName();
+
+        keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
+
+        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT);
+
+        certificateRepository.save(certificate1);
+    }
+
+    public void generateCACertificate(CertificateX509NameDto certificateX509NameDto, String serialNumber) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
+
+        SubjectData subject = generateSubjectData(certificateX509NameDto);
+        List<CertificateDto> certificateDtoList = findAll();
+        for(CertificateDto c : certificateDtoList) {
+            if(c.getSerialNumber().equals(serialNumber)) {
+                if(c.getCertificateRole() == CertificateRole.ROOT) {
+
+                    IssuerData issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/root.jks",
+                            c.getSerialNumber(), "root".toCharArray(),
+                            "root".toCharArray());
+
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
+
+                    keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
+                }else {
+
+                    IssuerData issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/intermediate.jks",
+                            c.getSerialNumber(),
+                            "intermediate".toCharArray(),
+                            "intermediate".toCharArray());
+
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer);
+
+                    keyStoreService.saveCertificate(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
+                }
+            }
+        }
+
+    }
+
+
 
 
 }

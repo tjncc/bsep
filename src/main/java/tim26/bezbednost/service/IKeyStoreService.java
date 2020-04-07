@@ -8,10 +8,17 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import java.io.FileNotFoundException;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.text.ParseException;
+import java.util.List;
+
 public interface IKeyStoreService {
 
-    public void saveCertificate(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role);
-    public List<X509Certificate> findKeyStoreCertificates(CertificateRole role) throws FileNotFoundException;
-
+    public List<X509Certificate> findKeyStoreCertificatesByRole(CertificateRole role) throws FileNotFoundException;
+    public void saveCertificateToKeyStore(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role);
+    void generateRootKeyStore() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException;
 
 }

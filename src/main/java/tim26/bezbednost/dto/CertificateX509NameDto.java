@@ -7,7 +7,6 @@ public class CertificateX509NameDto {
     private String commonName;
     private String state;
     private String city;
-    private String location;
     private String email;
     private String organization;
     private String organizationUnit;
@@ -40,14 +39,6 @@ public class CertificateX509NameDto {
 
     public void setCity(String city) {
         this.city = city;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
     }
 
     public String getEmail() {
