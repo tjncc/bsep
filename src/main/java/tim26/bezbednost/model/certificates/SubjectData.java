@@ -48,11 +48,11 @@ public class SubjectData {
         this.publicKey = publicKey;
     }
 
-    public BigInteger getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(BigInteger serialNumber) {
+    public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 
