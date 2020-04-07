@@ -1,5 +1,6 @@
 package tim26.bezbednost.model.certificates;
 
+import java.math.BigInteger;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Date;
@@ -16,6 +17,7 @@ public class SubjectData {
     private LocalDate startDate;
     private LocalDate endDate;
     private PrivateKey privateKey;
+
 
     public SubjectData() {
 
@@ -46,11 +48,11 @@ public class SubjectData {
         this.publicKey = publicKey;
     }
 
-    public String getSerialNumber() {
+    public BigInteger getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(String serialNumber) {
+    public void setSerialNumber(BigInteger serialNumber) {
         this.serialNumber = serialNumber;
     }
 
@@ -78,4 +80,3 @@ public class SubjectData {
         this.privateKey = privateKey;
     }
 }
-

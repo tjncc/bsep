@@ -1,5 +1,6 @@
 package tim26.bezbednost.model.certificates;
 
+import java.math.BigInteger;
 import java.security.PrivateKey;
 
 import org.bouncycastle.asn1.x500.X500Name;
@@ -8,6 +9,7 @@ public class IssuerData {
 
     private X500Name x500name;
     private PrivateKey privateKey;
+    private String serialNumber;
 
     public IssuerData() {
     }
@@ -33,5 +35,12 @@ public class IssuerData {
         this.privateKey = privateKey;
     }
 
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
 }
 

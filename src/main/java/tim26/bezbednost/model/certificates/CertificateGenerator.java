@@ -28,7 +28,7 @@ public class  CertificateGenerator {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData) {
+    public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData,boolean isCA) {
         try {
             //Posto klasa za generisanje sertifiakta ne moze da primi direktno privatni kljuc pravi se builder za objekat
             //Ovaj objekat sadrzi privatni kljuc izdavaoca sertifikata i koristiti se za potpisivanje sertifikata
@@ -50,6 +50,11 @@ public class  CertificateGenerator {
             //Generise se sertifikat
             X509CertificateHolder certHolder = certGen.build(contentSigner);
 
+            BasicConstraints basicConstraints = new BasicConstraints(isCA);
+            //true ako je CA
+            //basic constraint je critial
+            certGen.addExtension(Extension.basicConstraints, true, basicConstraints);
+
             //Builder generise sertifikat kao objekat klase X509CertificateHolder
             //Nakon toga je potrebno certHolder konvertovati u sertifikat, za sta se koristi certConverter
             JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
@@ -66,6 +71,8 @@ public class  CertificateGenerator {
         } catch (OperatorCreationException e) {
             e.printStackTrace();
         } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (CertIOException e) {
             e.printStackTrace();
         }
         return null;
