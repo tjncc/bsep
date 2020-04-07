@@ -18,7 +18,7 @@ public class CertificateController {
     @RequestMapping(method = RequestMethod.GET)
     public void findAll(){
 
-            
+
 
 
     }

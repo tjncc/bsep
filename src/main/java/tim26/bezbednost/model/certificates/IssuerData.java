@@ -9,7 +9,7 @@ public class IssuerData {
 
     private X500Name x500name;
     private PrivateKey privateKey;
-    private BigInteger serialNumber;
+    private String serialNumber;
 
     public IssuerData() {
     }
@@ -35,11 +35,11 @@ public class IssuerData {
         this.privateKey = privateKey;
     }
 
-    public BigInteger getSerialNumber() {
+    public String getSerialNumber() {
         return serialNumber;
     }
 
-    public void setSerialNumber(BigInteger serialNumber) {
+    public void setSerialNumber(String serialNumber) {
         this.serialNumber = serialNumber;
     }
 }
