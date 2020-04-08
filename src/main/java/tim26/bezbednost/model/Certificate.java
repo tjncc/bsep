@@ -1,10 +1,12 @@
 package tim26.bezbednost.model;
 
 import tim26.bezbednost.model.enumeration.CertificateRole;
+import tim26.bezbednost.model.enumeration.CertificateStatus;
 import tim26.bezbednost.model.enumeration.CertificateType;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDate;
 
 @Entity
 public class Certificate  implements Serializable {
@@ -27,6 +29,15 @@ public class Certificate  implements Serializable {
     @Column(name="commonName", unique = true)
     private String commonName;
 
+    @Column(name = "validto")
+    private LocalDate validTo;
+
+    @Column(name = "validfrom")
+    private LocalDate validFrom;
+
+    @Column(name = "status")
+    private CertificateStatus certificateStatus;
+
     public Certificate() {
     }
 
@@ -35,6 +46,16 @@ public class Certificate  implements Serializable {
         this.role = certificateRole;
         this.type = type;
         this.commonName = commonName;
+    }
+
+    public Certificate(String serialNumber, CertificateRole certificateRole,CertificateType type,String commonName, LocalDate validFrom, LocalDate validTo, CertificateStatus certificateStatus) {
+        this.serialNumber = serialNumber;
+        this.role = certificateRole;
+        this.type = type;
+        this.commonName = commonName;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.certificateStatus = certificateStatus;
     }
 
 
@@ -76,5 +97,29 @@ public class Certificate  implements Serializable {
 
     public void setCommonName(String commonName) {
         this.commonName = commonName;
+    }
+
+    public LocalDate getValidTo() {
+        return validTo;
+    }
+
+    public void setValidTo(LocalDate validTo) {
+        this.validTo = validTo;
+    }
+
+    public LocalDate getValidFrom() {
+        return validFrom;
+    }
+
+    public void setValidFrom(LocalDate validFrom) {
+        this.validFrom = validFrom;
+    }
+
+    public CertificateStatus getCertificateStatus() {
+        return certificateStatus;
+    }
+
+    public void setCertificateStatus(CertificateStatus certificateStatus) {
+        this.certificateStatus = certificateStatus;
     }
 }
