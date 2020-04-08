@@ -34,8 +34,13 @@ public class CertificateController {
 
 
     @RequestMapping(method = RequestMethod.GET, value = "/generateroot")
-    public ResponseEntity<List<CertificateDto>> makeRoot() {
-        try {
+    public ResponseEntity<List<CertificateDto>> makeRoot() throws FileNotFoundException {
+
+        boolean shouldGenerateRoot = certificateService.findIfRootExists();
+        if(shouldGenerateRoot)
+        {
+            try {
+
             certificateService.generateRoot();
             return  new ResponseEntity<>(certificateService.findAll(),HttpStatus.OK);
         } catch (ParseException e) {
@@ -51,7 +56,9 @@ public class CertificateController {
         } catch (InvalidKeyException e) {
             e.printStackTrace();
         }
-    return null;
+
+        }
+        return null;
     }
 
 }

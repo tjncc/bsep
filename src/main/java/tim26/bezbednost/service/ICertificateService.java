@@ -21,6 +21,6 @@ public interface ICertificateService {
     public IssuerData generateIssuerData(CertificateX509NameDto certificateDto, PrivateKey privateKey);
     public List<CertificateX509NameDto> getAllCACertificates() throws FileNotFoundException;
     public void generateRoot() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException;
-
+    public boolean findIfRootExists() throws FileNotFoundException;
 
     }

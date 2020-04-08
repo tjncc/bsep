@@ -287,8 +287,18 @@ public class CertificateService implements ICertificateService {
         keyStoreService.generateRootKeyStore();
         }
 
+    @Override
+    public boolean findIfRootExists() throws FileNotFoundException {
 
+        List<X509Certificate> certs = keyStoreService.findKeyStoreCertificatesByRole(CertificateRole.ROOT);
+        if(certs.size() == 0){
 
+           return true;
+       }
+        else {
+            return false;
+        }
+    }
 
 
 }
