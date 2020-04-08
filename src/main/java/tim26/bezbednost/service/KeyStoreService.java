@@ -118,7 +118,7 @@ public class KeyStoreService implements IKeyStoreService {
 
         certificateService.generateSelfSignedCertificate(certificatedto);
 
-        keyStoreWriter.saveKeyStore("./jks/root.jks","root".toCharArray());
+        //keyStoreWriter.saveKeyStore("./jks/root.jks","root".toCharArray());
 
     }
 

@@ -18,7 +18,7 @@ import tim26.bezbednost.repository.CertificateRepository;
 import tim26.bezbednost.repository.KeyStoreRepository;
 
 
-
+import javax.annotation.PostConstruct;
 import javax.management.relation.Role;
 import java.io.FileNotFoundException;
 import java.math.BigInteger;
@@ -52,6 +52,11 @@ public class CertificateService implements ICertificateService {
 
     @Autowired
     private CertificateGenerator certificateGenerator;
+
+    @PostConstruct
+    public void init() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
+        keyStoreService.generateRootKeyStore();
+    }
 
 
     @Override
@@ -96,7 +101,10 @@ public class CertificateService implements ICertificateService {
             keyPair = certificateGenerator.generateKeyPair(true);
         }
 
+        PublicKey pk = keyPair.getPublic();
+
         subjectData.setPublicKey(keyPair.getPublic());
+        subjectData.setPrivateKey(keyPair.getPrivate());
 
         LocalDate startDate = LocalDate.now();
         LocalDate endDate;
