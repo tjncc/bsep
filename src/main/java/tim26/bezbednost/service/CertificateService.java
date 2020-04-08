@@ -13,8 +13,11 @@ import tim26.bezbednost.model.certificates.CertificateGenerator;
 import tim26.bezbednost.model.certificates.IssuerData;
 import tim26.bezbednost.model.certificates.SubjectData;
 import tim26.bezbednost.model.enumeration.CertificateRole;
+import tim26.bezbednost.model.enumeration.CertificateType;
 import tim26.bezbednost.repository.CertificateRepository;
 import tim26.bezbednost.repository.KeyStoreRepository;
+
+
 
 import javax.management.relation.Role;
 import java.io.FileNotFoundException;
@@ -45,8 +48,7 @@ public class CertificateService implements ICertificateService {
     @Autowired
     private IKeyStoreService keyStoreService;
 
-    @Autowired
-    private KeyStoreRepository keyStoreRepository;
+
 
     @Autowired
     private CertificateGenerator certificateGenerator;
@@ -177,7 +179,7 @@ public class CertificateService implements ICertificateService {
 
         keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
 
-        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT);
+        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName());
 
         certificateRepository.save(certificate1);
     }
@@ -197,7 +199,7 @@ public class CertificateService implements ICertificateService {
                     X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true);
 
                     keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE,CertificateType.CA,certificateX509NameDto.getCommonName()));
                 } else {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/intermediate.jks",
@@ -208,7 +210,7 @@ public class CertificateService implements ICertificateService {
                     X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true);
 
                     keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
-                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE));
+                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName()));
                 }
             }
         }
@@ -233,6 +235,7 @@ public class CertificateService implements ICertificateService {
 
                     returnc = certificateGenerator.generateCertificate(subject, issuer,false);
                     keyStoreService.saveCertificateToKeyStore(returnc, certificatedto.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
+                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName()));
                     return  returnc;
 
                 }
@@ -250,6 +253,7 @@ public class CertificateService implements ICertificateService {
 
                     returnc = certificateGenerator.generateCertificate(subject, issuer,false);
                     keyStoreService.saveCertificateToKeyStore(returnc, certificatedto.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
+                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName()));
                     return  returnc;
 
                 }
@@ -259,6 +263,29 @@ public class CertificateService implements ICertificateService {
 
         }
 
+        public List<CertificateX509NameDto> getAllCACertificates() throws FileNotFoundException {
+
+
+
+            List<Certificate> allCA = certificateRepository.findAllByType(CertificateType.CA);
+            List<CertificateX509NameDto> returns =  new ArrayList<>();
+
+            for(Certificate c : allCA){
+
+                CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
+                returns.add(dto);
+
+            }
+
+            return returns;
+
+
+        }
+
+        public void generateRoot() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
+
+        keyStoreService.generateRootKeyStore();
+        }
 
 
 

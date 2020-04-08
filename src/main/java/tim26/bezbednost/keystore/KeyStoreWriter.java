@@ -1,5 +1,7 @@
 package tim26.bezbednost.keystore;
 
+import org.springframework.stereotype.Component;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,6 +14,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 
+@Component
 public class KeyStoreWriter {
 
     //KeyStore je Java klasa za citanje specijalizovanih datoteka koje se koriste za cuvanje kljuceva

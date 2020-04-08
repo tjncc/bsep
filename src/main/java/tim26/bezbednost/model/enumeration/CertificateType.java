@@ -1,6 +1,6 @@
 package tim26.bezbednost.model.enumeration;
 
-public enum CertificationType {
+public enum CertificateType {
 
     ENDENTITY,CA
 }
