@@ -8,7 +8,6 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.stereotype.Component;
-import sun.security.x509.X500Name;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

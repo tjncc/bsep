@@ -32,5 +32,14 @@ public class CertificateController {
         return new ResponseEntity<>(allCA, HttpStatus.OK);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value = "/save")
+    public ResponseEntity<CertificateX509NameDto> create(@RequestBody CertificateX509NameDto certificateX509NameDto) {
+        if(certificateService.save(certificateX509NameDto))
+            return new ResponseEntity<>(certificateX509NameDto, HttpStatus.OK);
+        else
+            return new ResponseEntity<>(certificateX509NameDto, HttpStatus.BAD_REQUEST);
+
+    }
+
 
 }

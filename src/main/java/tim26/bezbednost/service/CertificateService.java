@@ -295,7 +295,11 @@ public class CertificateService implements ICertificateService {
         keyStoreService.generateRootKeyStore();
         }
 
-
+    @Override
+    public boolean save(CertificateX509NameDto certificateX509NameDto) {
+        
+        return false;
+    }
 
 
 }
