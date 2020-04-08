@@ -1,6 +1,8 @@
 package tim26.bezbednost.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
@@ -43,14 +45,14 @@ public class KeyStoreService implements IKeyStoreService {
 
         } else if(role.equals(CertificateRole.INTERMEDIATE)) {
 
-            keyStoreWriter.loadKeyStore("../../../../../jks/intermediate.jks" ,"intermediate".toCharArray());
+            keyStoreWriter.loadKeyStore("./jks/intermediate.jks" ,"intermediate".toCharArray());
             keyStoreWriter.write(alias, privateKey,"intermediate".toCharArray(), certificate);
-            keyStoreWriter.saveKeyStore("../../../../../jks/intermediate.jks", "intermediate".toCharArray());
+            keyStoreWriter.saveKeyStore("./jks/intermediate.jks", "intermediate".toCharArray());
 
         } else if(role.equals(CertificateRole.ENDENTITY)){
-            keyStoreWriter.loadKeyStore("../../../../../jks/end-entity.jks", "end-entity".toCharArray());
+            keyStoreWriter.loadKeyStore("./jks/end-entity.jks", "end-entity".toCharArray());
             keyStoreWriter.write(alias, privateKey, "end-entity".toCharArray(), certificate);
-            keyStoreWriter.saveKeyStore("../../../../../jks/intermediate.jks", "end-entity".toCharArray());
+            keyStoreWriter.saveKeyStore("./jks/intermediate.jks", "end-entity".toCharArray());
         }
     }
 
@@ -73,7 +75,7 @@ public class KeyStoreService implements IKeyStoreService {
 
         } else if(role.equals(CertificateRole.INTERMEDIATE)){
 
-            List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("../../../../../jks/intermediate.jks", "intermediate".toCharArray());
+            List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("./jks/intermediate.jks", "intermediate".toCharArray());
 
 
             for(Certificate c : certificates){
@@ -86,7 +88,7 @@ public class KeyStoreService implements IKeyStoreService {
         } else if (role.equals(CertificateRole.ENDENTITY)){
 
 
-            List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("../../../../../jks/end-entity.jks", "end-entity".toCharArray());
+            List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("./jks/end-entity.jks", "end-entity".toCharArray());
 
             for(Certificate c : certificates){
                 X509Certificate cert = (X509Certificate)c;
@@ -128,7 +130,7 @@ public class KeyStoreService implements IKeyStoreService {
         } else {
             certificateService.generateCertificateNotCA(certificatedto, alias);
         }
-        keyStoreWriter.saveKeyStore("../../../../../jks/intermediate.jks", "intermediate".toCharArray());
+        keyStoreWriter.saveKeyStore("./jks/intermediate.jks", "intermediate".toCharArray());
 
     }
 
@@ -136,7 +138,7 @@ public class KeyStoreService implements IKeyStoreService {
 
         keyStoreWriter.loadKeyStore(null, "end-entity".toCharArray());
         certificateService.generateCertificateNotCA(certificatedto,alias);
-        keyStoreWriter.saveKeyStore("../../../../../jks/end-entity.jks","end-entity".toCharArray());
+        keyStoreWriter.saveKeyStore("./jks/end-entity.jks","end-entity".toCharArray());
 
 
     }

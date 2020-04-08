@@ -192,7 +192,7 @@ public class CertificateService implements ICertificateService {
             if (c.getSerialNumber().equals(serialNumber)) {
                 if (c.getCertificateRole() == CertificateRole.ROOT) {
 
-                    IssuerData issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/root.jks",
+                    IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
                             c.getSerialNumber(), "root".toCharArray(),
                             "root".toCharArray());
 
@@ -202,7 +202,7 @@ public class CertificateService implements ICertificateService {
                     certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE,CertificateType.CA,certificateX509NameDto.getCommonName()));
                 } else {
 
-                    IssuerData issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/intermediate.jks",
+                    IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/intermediate.jks",
                             c.getSerialNumber(),
                             "intermediate".toCharArray(),
                             "intermediate".toCharArray());
@@ -229,7 +229,7 @@ public class CertificateService implements ICertificateService {
 
                 if(c.getSerialNumber().equals(new BigInteger(alias))) {
 
-                    issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/root.jks",
+                    issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
                             String.valueOf(c.getSerialNumber()), "root".toCharArray(),
                             "root".toCharArray());
 
@@ -247,7 +247,7 @@ public class CertificateService implements ICertificateService {
 
                 if(c.getSerialNumber().equals(new BigInteger(alias))) {
 
-                    issuer = keyStoreReader.readIssuerFromStore("../../../../../jks/intermediate.jks",
+                    issuer = keyStoreReader.readIssuerFromStore("./jks/intermediate.jks",
                             String.valueOf(c.getSerialNumber()), "intermediate".toCharArray(),
                             "intermediate".toCharArray());
 
