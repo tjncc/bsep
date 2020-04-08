@@ -130,7 +130,8 @@ public class KeyStoreService implements IKeyStoreService {
         } else {
             certificateService.generateCertificateNotCA(certificatedto, alias);
         }
-        keyStoreWriter.saveKeyStore("./jks/intermediate.jks", "intermediate".toCharArray());
+
+        //keyStoreWriter.saveKeyStore("./jks/intermediate.jks", "intermediate".toCharArray());
 
     }
 
@@ -138,7 +139,7 @@ public class KeyStoreService implements IKeyStoreService {
 
         keyStoreWriter.loadKeyStore(null, "end-entity".toCharArray());
         certificateService.generateCertificateNotCA(certificatedto,alias);
-        keyStoreWriter.saveKeyStore("./jks/end-entity.jks","end-entity".toCharArray());
+        //keyStoreWriter.saveKeyStore("./jks/end-entity.jks","end-entity".toCharArray());
 
 
     }
