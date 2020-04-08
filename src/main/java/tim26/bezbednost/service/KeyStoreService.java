@@ -120,9 +120,15 @@ public class KeyStoreService implements IKeyStoreService {
 
     }
 
-    public void generateIntermediateKeyStore(String alias, CertificateX509NameDto certificatedto){
+    public void generateIntermediateKeyStore(String alias, CertificateX509NameDto certificatedto, boolean isCA) throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, FileNotFoundException {
 
-
+        keyStoreWriter.loadKeyStore(null, "intermediate".toCharArray());
+        if(isCA) {
+            certificateService.generateCACertificate(certificatedto, alias);
+        } else {
+            certificateService.generateCertificateNotCA(certificatedto, alias);
+        }
+        keyStoreWriter.saveKeyStore("../../../../../jks/intermediate.jks", "intermediate".toCharArray());
 
     }
 
