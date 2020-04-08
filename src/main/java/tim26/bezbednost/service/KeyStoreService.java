@@ -36,10 +36,10 @@ public class KeyStoreService implements IKeyStoreService {
     public void saveCertificateToKeyStore(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role) {
 
         if( role.equals(CertificateRole.ROOT)) {
-            keyStoreWriter.loadKeyStore("../../../../../jks/root.jks", "root".toCharArray());
+            keyStoreWriter.loadKeyStore("./jks/root.jks", "root".toCharArray());
 
             keyStoreWriter.write(alias, privateKey, "root".toCharArray(), certificate);
-            keyStoreWriter.saveKeyStore("../../../../../jks/root.jks", "root".toCharArray());
+            keyStoreWriter.saveKeyStore("./jks/root.jks", "root".toCharArray());
 
         } else if(role.equals(CertificateRole.INTERMEDIATE)) {
 
@@ -61,7 +61,7 @@ public class KeyStoreService implements IKeyStoreService {
 
         if(role.equals(CertificateRole.ROOT)){
 
-            List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("../../../../../jks/root.jks", "root".toCharArray());
+            List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("./jks/root.jks", "root".toCharArray());
 
 
             for(Certificate c : certificates){
@@ -116,7 +116,7 @@ public class KeyStoreService implements IKeyStoreService {
 
         certificateService.generateSelfSignedCertificate(certificatedto);
 
-        keyStoreWriter.saveKeyStore("../../../../../jks/root.jks","root".toCharArray());
+        keyStoreWriter.saveKeyStore("./jks/root.jks","root".toCharArray());
 
     }
 

@@ -29,36 +29,8 @@ public class CertificateController {
     public ResponseEntity<List<CertificateX509NameDto>> getAllCACertificates() throws FileNotFoundException {
 
         List<CertificateX509NameDto> allCA = certificateService.getAllCACertificates();
-        return  new ResponseEntity<>(allCA,HttpStatus.OK);
+        return new ResponseEntity<>(allCA, HttpStatus.OK);
     }
 
-
-    @RequestMapping(method = RequestMethod.GET, value = "/generateroot")
-    public ResponseEntity<List<CertificateDto>> makeRoot() throws FileNotFoundException {
-
-        boolean shouldGenerateRoot = certificateService.findIfRootExists();
-        if(shouldGenerateRoot)
-        {
-            try {
-
-            certificateService.generateRoot();
-            return  new ResponseEntity<>(certificateService.findAll(),HttpStatus.OK);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (SignatureException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        }
-
-        }
-        return null;
-    }
 
 }
