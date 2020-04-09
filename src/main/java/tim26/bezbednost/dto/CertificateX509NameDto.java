@@ -3,6 +3,8 @@ package tim26.bezbednost.dto;
 import tim26.bezbednost.model.enumeration.CertificateRole;
 import tim26.bezbednost.model.enumeration.CertificateType;
 
+import java.time.LocalDate;
+
 public class CertificateX509NameDto {
 
     private String commonName;
@@ -12,6 +14,8 @@ public class CertificateX509NameDto {
     private String organization;
     private String organizationUnit;
     private String serialNumber;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private CertificateRole certificateRole;
     private String issuerSerialNumber;
     private CertificateType subjectType;
@@ -98,5 +102,21 @@ public class CertificateX509NameDto {
 
     public void setIssuerSerialNumber(String issuerSerialNumber) {
         this.issuerSerialNumber = issuerSerialNumber;
+    }
+
+    public LocalDate getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(LocalDate startDate) {
+        this.startDate = startDate;
+    }
+
+    public LocalDate getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(LocalDate endDate) {
+        this.endDate = endDate;
     }
 }
