@@ -112,6 +112,8 @@ public class CertificateX509NameDto {
 
     public void setCertificateStatus(CertificateStatus certificateStatus) {
         this.certificateStatus = certificateStatus;
+    }
+    
     public LocalDate getStartDate() {
         return startDate;
     }
