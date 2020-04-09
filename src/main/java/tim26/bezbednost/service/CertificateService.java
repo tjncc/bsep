@@ -186,7 +186,7 @@ public class CertificateService implements ICertificateService {
         String certificateIssuer = certificate.getIssuerX500Principal().getName();
         String certificateOwner = certificate.getSubjectX500Principal().getName();
 
-        keyStoreService.saveCertificateToKeyStore(certificate, certificateX509NameDto.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
+        keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
 
         Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName());
 

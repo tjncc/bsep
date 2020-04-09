@@ -39,7 +39,6 @@ public class KeyStoreService implements IKeyStoreService {
 
         if( role.equals(CertificateRole.ROOT)) {
             keyStoreWriter.loadKeyStore("./jks/root.jks", "root".toCharArray());
-
             keyStoreWriter.write(alias, privateKey, "root".toCharArray(), certificate);
             keyStoreWriter.saveKeyStore("./jks/root.jks", "root".toCharArray());
 
