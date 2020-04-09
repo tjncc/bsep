@@ -253,7 +253,6 @@ public class CertificateService implements ICertificateService {
             IssuerData issuer =  null;
             X509Certificate returnc = null;
 
-            //List<X509Certificate> certsRoots = keyStoreService.findKeyStoreCertificatesByRole(CertificateRole.ROOT);
             List<Certificate> certsRoots = certificateRepository.findAllByRole(CertificateRole.ROOT);
             List<Certificate> certIntermediates =  certificateRepository.findAllByRole(CertificateRole.INTERMEDIATE);
             List<Certificate> all = new ArrayList<>();
@@ -272,124 +271,99 @@ public class CertificateService implements ICertificateService {
                        }
                         catch (Exception e){
 
-
                             issuer = keyStoreReader.readIssuerFromStore("./jks/intermediate.jks",
                                     String.valueOf(c.getSerialNumber()), "intermediate".toCharArray(),
                                     "intermediate".toCharArray());
-
                         }
-
 
                     returnc = certificateGenerator.generateCertificate(subject, issuer,false);
 
                     if(isFristTime == false){
                         keyStoreService.saveCertificateToKeyStore(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
-                        }else{
-                            keyStoreService.saveWhenKeyStoreIsGenerating(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
+                    }else{
+                        keyStoreService.saveWhenKeyStoreIsGenerating(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
                     }
+
                     if(certificatedto.getEndDate() == null){
                         certificatedto.setEndDate(certificatedto.getStartDate().plusYears(2));
                     }
-                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID));
-                    return  returnc;
+
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID));
+                    return returnc;
 
                 }
             }
 
-            List<X509Certificate> certsIntermediates = keyStoreService.findKeyStoreCertificatesByRole(CertificateRole.INTERMEDIATE);
-
-
             return  returnc;
-
         }
 
+
         public List<CertificateX509NameDto> getAllCACertificates() throws FileNotFoundException {
-
-
 
             List<Certificate> allCA = certificateRepository.findAllByType(CertificateType.CA);
             List<CertificateX509NameDto> returns =  new ArrayList<>();
 
             for(Certificate c : allCA){
-
                 CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
                 returns.add(dto);
-
             }
 
             return returns;
-
-
         }
 
-        public void generateRoot() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
 
+        public void generateRoot() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
         keyStoreService.generateRootKeyStore();
         }
 
     @Override
     public boolean save(CertificateX509NameDto certificateX509NameDto) throws CertificateException, ParseException, NoSuchAlgorithmException, FileNotFoundException, SignatureException, NoSuchProviderException, InvalidKeyException {
 
-        //String serialNumber = generateSerialNumber();
-        //ertificateX509NameDto.setSerialNumber(serialNumber);
-
         LocalDate start = LocalDate.now();
         certificateX509NameDto.setStartDate(start);
+
+        String alias = certificateX509NameDto.getIssuerSerialNumber();
 
         if(certificateX509NameDto.getSubjectType() == CertificateType.CA) {
 
             certificateX509NameDto.setCertificateRole(CertificateRole.INTERMEDIATE);
 
             if (certificateRepository.findAllByRole(CertificateRole.INTERMEDIATE).size() == 0) {
-
-                keyStoreService.generateIntermediateKeyStore( certificateX509NameDto.getIssuerSerialNumber(), certificateX509NameDto, true);
+                    generateCACertificate(certificateX509NameDto, alias,true);
                 return true;
-
-            }else {
-
-                generateCACertificate(certificateX509NameDto,certificateX509NameDto.getIssuerSerialNumber(),false);
+            } else {
+                generateCACertificate(certificateX509NameDto, alias,false);
                 return true;
             }
 
-        } else if( certificateX509NameDto.getSubjectType() ==  CertificateType.ENDENTITY){
+        } else if(certificateX509NameDto.getSubjectType() ==  CertificateType.ENDENTITY){
 
-                    certificateX509NameDto.setCertificateRole(CertificateRole.ENDENTITY);
+            certificateX509NameDto.setCertificateRole(CertificateRole.ENDENTITY);
 
             if (certificateRepository.findAllByRole(CertificateRole.ENDENTITY).size() == 0) {
-
-                keyStoreService.generateEndEntityKeyStore(certificateX509NameDto.getIssuerSerialNumber(), certificateX509NameDto);
+                generateCertificateNotCA(certificateX509NameDto, alias,true);
                 return true;
-
             }else {
-
-                generateCertificateNotCA(certificateX509NameDto,certificateX509NameDto.getIssuerSerialNumber(),false);
+                generateCertificateNotCA(certificateX509NameDto, alias,false);
                 return true;
             }
 
-        }
-
-        else {
+        } else {
             return false;
         }
-
     }
 
     @Override
     public String generateSerialNumber() {
 
-
         Random rand = new Random();
         int serialNumber = rand.nextInt(10000);
         String StringSerialNumber = String.valueOf(serialNumber);
 
-
-        while(certificateRepository.findBySerialNumber(StringSerialNumber) != null)
-            {
-
-                serialNumber = rand.nextInt(10000);
-                StringSerialNumber = String.valueOf(serialNumber);
-            }
-
+        while(certificateRepository.findBySerialNumber(StringSerialNumber) != null) {
+            serialNumber = rand.nextInt(10000);
+            StringSerialNumber = String.valueOf(serialNumber);
+        }
 
         return  StringSerialNumber;
     }
