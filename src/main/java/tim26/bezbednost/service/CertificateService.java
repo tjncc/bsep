@@ -195,7 +195,7 @@ public class CertificateService implements ICertificateService {
 
         }
 
-        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName());
+        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID);
 
         certificateRepository.save(certificate1);
     }
@@ -219,7 +219,10 @@ public class CertificateService implements ICertificateService {
                     }else{
                         keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     }
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE,CertificateType.CA,certificateX509NameDto.getCommonName()));
+                    if(certificateX509NameDto.getEndDate() == null){
+                        certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
+                    }
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
                 } else {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/intermediate.jks",
@@ -234,8 +237,10 @@ public class CertificateService implements ICertificateService {
                     }else {
                         keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                         }
-
-                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName()));
+                    if(certificateX509NameDto.getEndDate() == null){
+                        certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
+                    }
+                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
                 }
             }
         }
@@ -282,7 +287,10 @@ public class CertificateService implements ICertificateService {
                         }else{
                             keyStoreService.saveWhenKeyStoreIsGenerating(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
                     }
-                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName()));
+                    if(certificatedto.getEndDate() == null){
+                        certificatedto.setEndDate(certificatedto.getStartDate().plusYears(2));
+                    }
+                    this.certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID));
                     return  returnc;
 
                 }
@@ -325,6 +333,9 @@ public class CertificateService implements ICertificateService {
         //String serialNumber = generateSerialNumber();
         //ertificateX509NameDto.setSerialNumber(serialNumber);
         certificateX509NameDto.setCertificateStatus(CertificateStatus.VALID);
+
+        LocalDate start = LocalDate.now();
+        certificateX509NameDto.setStartDate(start);
 
         if(certificateX509NameDto.getSubjectType() == CertificateType.CA) {
 

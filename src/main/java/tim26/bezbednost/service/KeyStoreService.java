@@ -19,6 +19,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,6 +140,12 @@ public class KeyStoreService implements IKeyStoreService {
         certificatedto.setState("Vojvodina");
         certificatedto.setCertificateRole(CertificateRole.ROOT);
         certificatedto.setEmail("trioF@gmail.com");
+
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusYears(10);
+        certificatedto.setStartDate(startDate);
+        certificatedto.setEndDate(endDate);
+
         //????
         //certificatedto.setSerialNumber("345");
 
