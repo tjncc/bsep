@@ -114,7 +114,7 @@ public class KeyStoreService implements IKeyStoreService {
         certificatedto.setCertificateRole(CertificateRole.ROOT);
         certificatedto.setEmail("trioF@gmail.com");
         //????
-        certificatedto.setSerialNumber("34567890567890");
+        //certificatedto.setSerialNumber("345");
 
         certificateService.generateSelfSignedCertificate(certificatedto);
 

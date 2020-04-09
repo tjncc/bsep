@@ -32,6 +32,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class CertificateService implements ICertificateService {
@@ -296,9 +297,67 @@ public class CertificateService implements ICertificateService {
         }
 
     @Override
-    public boolean save(CertificateX509NameDto certificateX509NameDto) {
-        
-        return false;
+    public boolean save(CertificateX509NameDto certificateX509NameDto) throws CertificateException, ParseException, NoSuchAlgorithmException, FileNotFoundException, SignatureException, NoSuchProviderException, InvalidKeyException {
+
+        String serialNumber = generateSerialNumber();
+        certificateX509NameDto.setSerialNumber(serialNumber);
+
+        if(certificateX509NameDto.getSubjectType() == CertificateType.CA) {
+
+            certificateX509NameDto.setCertificateRole(CertificateRole.INTERMEDIATE);
+
+            if (certificateRepository.findAllByRole(CertificateRole.INTERMEDIATE).size() == 0) {
+
+                keyStoreService.generateIntermediateKeyStore( certificateX509NameDto.getIssuerSerialNumber(), certificateX509NameDto, true);
+                return true;
+
+            }else {
+
+                generateCACertificate(certificateX509NameDto,certificateX509NameDto.getIssuerSerialNumber());
+                return true;
+            }
+
+        } else if( certificateX509NameDto.getSubjectType() ==  CertificateType.ENDENTITY){
+
+                    certificateX509NameDto.setCertificateRole(CertificateRole.ENDENTITY);
+
+            if (certificateRepository.findAllByRole(CertificateRole.ENDENTITY).size() == 0) {
+
+                keyStoreService.generateEndEntityKeyStore(certificateX509NameDto.getIssuerSerialNumber(), certificateX509NameDto);
+                return true;
+
+            }else {
+
+                generateCertificateNotCA(certificateX509NameDto,certificateX509NameDto.getIssuerSerialNumber());
+                return true;
+            }
+
+        }
+
+        else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public String generateSerialNumber() {
+
+
+        Random rand = new Random();
+        int serialNumber = rand.nextInt(10000);
+        String StringSerialNumber = String.valueOf(serialNumber);
+
+
+        while(certificateRepository.findBySerialNumber(StringSerialNumber) != null)
+            {
+
+                serialNumber = rand.nextInt(10000);
+                StringSerialNumber = String.valueOf(serialNumber);
+            }
+
+
+        return  StringSerialNumber;
     }
 
 

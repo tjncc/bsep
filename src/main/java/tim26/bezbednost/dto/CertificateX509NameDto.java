@@ -84,19 +84,19 @@ public class CertificateX509NameDto {
         this.certificateRole = certificateRole;
     }
 
-    public String getIssuerId() {
-        return IssuerSerialNumber;
-    }
-
-    public void setIssuerId(String issuerSerialNumber) {
-        this.IssuerSerialNumber = issuerSerialNumber;
-    }
-
     public CertificateType getSubjectType() {
         return subjectType;
     }
 
     public void setSubjectType(CertificateType subjectType) {
         this.subjectType = subjectType;
+    }
+
+    public String getIssuerSerialNumber() {
+        return IssuerSerialNumber;
+    }
+
+    public void setIssuerSerialNumber(String issuerSerialNumber) {
+        IssuerSerialNumber = issuerSerialNumber;
     }
 }

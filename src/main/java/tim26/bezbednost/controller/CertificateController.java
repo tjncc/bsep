@@ -33,7 +33,7 @@ public class CertificateController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/save")
-    public ResponseEntity<CertificateX509NameDto> create(@RequestBody CertificateX509NameDto certificateX509NameDto) {
+    public ResponseEntity<CertificateX509NameDto> create(@RequestBody CertificateX509NameDto certificateX509NameDto) throws CertificateException, ParseException, NoSuchAlgorithmException, FileNotFoundException, SignatureException, NoSuchProviderException, InvalidKeyException {
         if(certificateService.save(certificateX509NameDto))
             return new ResponseEntity<>(certificateX509NameDto, HttpStatus.OK);
         else

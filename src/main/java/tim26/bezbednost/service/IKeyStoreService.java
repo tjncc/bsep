@@ -23,4 +23,5 @@ public interface IKeyStoreService {
     public void generateRootKeyStore() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException;
     public void generateIntermediateKeyStore(String alias, CertificateX509NameDto certificatedto, boolean isCA) throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, FileNotFoundException;
     public void generateEndEntityKeyStore(String alias, CertificateX509NameDto certificatedto) throws FileNotFoundException;
+
 }
