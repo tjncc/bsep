@@ -13,7 +13,7 @@ public class CertificateX509NameDto {
     private String organizationUnit;
     private String serialNumber;
     private CertificateRole certificateRole;
-    private String IssuerSerialNumber;
+    private String issuerSerialNumber;
     private CertificateType subjectType;
 
     public CertificateX509NameDto() {
@@ -93,10 +93,10 @@ public class CertificateX509NameDto {
     }
 
     public String getIssuerSerialNumber() {
-        return IssuerSerialNumber;
+        return issuerSerialNumber;
     }
 
     public void setIssuerSerialNumber(String issuerSerialNumber) {
-        IssuerSerialNumber = issuerSerialNumber;
+        this.issuerSerialNumber = issuerSerialNumber;
     }
 }
