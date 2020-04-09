@@ -1,6 +1,7 @@
 package tim26.bezbednost.dto;
 
 import tim26.bezbednost.model.enumeration.CertificateRole;
+import tim26.bezbednost.model.enumeration.CertificateStatus;
 import tim26.bezbednost.model.enumeration.CertificateType;
 
 public class CertificateX509NameDto {
@@ -15,6 +16,7 @@ public class CertificateX509NameDto {
     private CertificateRole certificateRole;
     private String issuerSerialNumber;
     private CertificateType subjectType;
+    private CertificateStatus certificateStatus;
 
     public CertificateX509NameDto() {
 
@@ -98,5 +100,13 @@ public class CertificateX509NameDto {
 
     public void setIssuerSerialNumber(String issuerSerialNumber) {
         this.issuerSerialNumber = issuerSerialNumber;
+    }
+
+    public CertificateStatus getCertificateStatus() {
+        return certificateStatus;
+    }
+
+    public void setCertificateStatus(CertificateStatus certificateStatus) {
+        this.certificateStatus = certificateStatus;
     }
 }

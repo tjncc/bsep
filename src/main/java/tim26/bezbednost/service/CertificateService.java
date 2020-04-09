@@ -13,6 +13,7 @@ import tim26.bezbednost.model.certificates.CertificateGenerator;
 import tim26.bezbednost.model.certificates.IssuerData;
 import tim26.bezbednost.model.certificates.SubjectData;
 import tim26.bezbednost.model.enumeration.CertificateRole;
+import tim26.bezbednost.model.enumeration.CertificateStatus;
 import tim26.bezbednost.model.enumeration.CertificateType;
 import tim26.bezbednost.repository.CertificateRepository;
 import tim26.bezbednost.repository.KeyStoreRepository;
@@ -323,6 +324,7 @@ public class CertificateService implements ICertificateService {
 
         //String serialNumber = generateSerialNumber();
         //ertificateX509NameDto.setSerialNumber(serialNumber);
+        certificateX509NameDto.setCertificateStatus(CertificateStatus.VALID);
 
         if(certificateX509NameDto.getSubjectType() == CertificateType.CA) {
 
