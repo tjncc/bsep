@@ -236,7 +236,7 @@ public class CertificateService implements ICertificateService {
 
             for(X509Certificate c : certsRoots) {
 
-                if(c.getSerialNumber().equals(new BigInteger(alias))) {
+                if(c.getSerialNumber().equals(alias)) {
 
                     issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
                             String.valueOf(c.getSerialNumber()), "root".toCharArray(),
@@ -254,7 +254,7 @@ public class CertificateService implements ICertificateService {
 
             for(X509Certificate c : certsRoots) {
 
-                if(c.getSerialNumber().equals(new BigInteger(alias))) {
+                if(c.getSerialNumber().equals(alias)) {
 
                     issuer = keyStoreReader.readIssuerFromStore("./jks/intermediate.jks",
                             String.valueOf(c.getSerialNumber()), "intermediate".toCharArray(),
