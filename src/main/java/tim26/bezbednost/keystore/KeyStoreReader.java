@@ -86,6 +86,7 @@ public class KeyStoreReader {
     public Certificate readCertificate(String keyStoreFile, String keyStorePass, String alias) {
         try {
             //kreiramo instancu KeyStore
+
             KeyStore ks = KeyStore.getInstance("JKS", "SUN");
             //ucitavamo podatke
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));

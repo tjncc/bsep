@@ -265,9 +265,11 @@ public class CertificateService implements ICertificateService {
                 if(c.getSerialNumber().equals(alias)) {
 
                         try
-                       { issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
+                       {
+                           issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
                                 String.valueOf(c.getSerialNumber()), "root".toCharArray(),
-                                "root".toCharArray());}
+                                "root".toCharArray());
+                       }
                         catch (Exception e){
 
 
