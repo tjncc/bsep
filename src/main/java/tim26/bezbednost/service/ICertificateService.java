@@ -10,17 +10,33 @@ import javax.management.relation.Role;
 import java.io.FileNotFoundException;
 import java.security.*;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.List;
 
 public interface ICertificateService {
 
     public List<CertificateDto> findAll();
+
     public CertificateX509NameDto[] getIssuerAndSubjectData(String serialNumber, CertificateRole certificateRole) throws FileNotFoundException;
+
     public SubjectData generateSubjectData(CertificateX509NameDto certificateDto);
+
     public IssuerData generateIssuerData(CertificateX509NameDto certificateDto, PrivateKey privateKey);
+
     public List<CertificateX509NameDto> getAllCACertificates() throws FileNotFoundException;
+
     public void generateRoot() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException;
+
     public boolean save(CertificateX509NameDto certificateX509NameDto) throws CertificateException, ParseException, NoSuchAlgorithmException, FileNotFoundException, SignatureException, NoSuchProviderException, InvalidKeyException;
+
     public String generateSerialNumber();
+
+    public void generateCACertificate(CertificateX509NameDto certificateX509NameDto, String serialNumber, boolean isFristTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException;
+
+    public X509Certificate generateCertificateNotCA(CertificateX509NameDto certificateX509NameDto, String serialNumber, boolean isFirstTime) throws FileNotFoundException;
+
+    public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto,boolean isFristTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException;
+
+
 }
