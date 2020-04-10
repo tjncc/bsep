@@ -16,13 +16,10 @@ import tim26.bezbednost.model.enumeration.CertificateRole;
 import tim26.bezbednost.model.enumeration.CertificateStatus;
 import tim26.bezbednost.model.enumeration.CertificateType;
 import tim26.bezbednost.repository.CertificateRepository;
-import tim26.bezbednost.repository.KeyStoreRepository;
 
 
 import javax.annotation.PostConstruct;
-import javax.management.relation.Role;
 import java.io.FileNotFoundException;
-import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -31,7 +28,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -67,7 +63,10 @@ public class CertificateService implements ICertificateService {
         List<CertificateDto> certificateDtos = new ArrayList<CertificateDto>();
 
         for (Certificate c : certificates) {
-            certificateDtos.add(modelMapper.map(c, CertificateDto.class));
+
+            if(c.getCertificateStatus().equals(CertificateStatus.VALID)) {
+                certificateDtos.add(modelMapper.map(c, CertificateDto.class));
+            }
         }
 
         return certificateDtos;
@@ -159,6 +158,23 @@ public class CertificateService implements ICertificateService {
         certificateRepository.save(certificate1);
     }
 
+    @Override
+    public List<Certificate> getAllRoots() {
+
+        List<Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
+        List<Certificate> returnlist = new ArrayList<>();
+
+        if(certificates.size() != 0){
+
+            for(Certificate c : certificates){
+                if(c.getCertificateStatus().equals(CertificateStatus.REVOKED)){
+                    returnlist.add(c);
+                }
+            }
+        }
+        return returnlist;
+    }
+
 
     public void generateCACertificate(CertificateX509NameDto certificateX509NameDto, String alias, boolean isFirstTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
 
@@ -166,7 +182,7 @@ public class CertificateService implements ICertificateService {
         List<CertificateDto> certificateDtoList = findAll();
 
         for (CertificateDto c : certificateDtoList) {
-            if (c.getSerialNumber().equals(alias)) {
+            if (c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
                 if (c.getCertificateRole() == CertificateRole.ROOT) {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
@@ -226,7 +242,7 @@ public class CertificateService implements ICertificateService {
 
         for(Certificate c : all) {
 
-            if(c.getSerialNumber().equals(alias)) {
+            if(c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
 
                 try
                 {
@@ -265,8 +281,10 @@ public class CertificateService implements ICertificateService {
         List<CertificateX509NameDto> returns =  new ArrayList<>();
 
         for(Certificate c : allCA){
-            CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
-            returns.add(dto);
+            if(c.getCertificateStatus().equals(CertificateStatus.VALID)){
+                CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
+                returns.add(dto);
+            }
         }
 
         return returns;

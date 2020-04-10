@@ -2,6 +2,7 @@ package tim26.bezbednost.service;
 
 import tim26.bezbednost.dto.CertificateDto;
 import tim26.bezbednost.dto.CertificateX509NameDto;
+import tim26.bezbednost.model.Certificate;
 import tim26.bezbednost.model.certificates.IssuerData;
 import tim26.bezbednost.model.certificates.SubjectData;
 import tim26.bezbednost.model.enumeration.CertificateRole;
@@ -34,5 +35,5 @@ public interface ICertificateService {
 
     public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto,boolean isFristTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException;
 
-
+    public List<Certificate> getAllRoots();
 }
