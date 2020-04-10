@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import tim26.bezbednost.dto.CertificateDto;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
-import tim26.bezbednost.model.Certificate;
+import java.security.cert.Certificate;
 import tim26.bezbednost.model.certificates.CertificateGenerator;
 import tim26.bezbednost.model.certificates.IssuerData;
 import tim26.bezbednost.model.certificates.SubjectData;
@@ -65,10 +65,10 @@ public class CertificateService implements ICertificateService {
     @Override
     public List<CertificateDto> findAll() {
 
-        List<Certificate> certificates = certificateRepository.findAll();
+        List< tim26.bezbednost.model.Certificate> certificates = certificateRepository.findAll();
         List<CertificateDto> certificateDtos = new ArrayList<CertificateDto>();
 
-        for (Certificate c : certificates) {
+        for (tim26.bezbednost.model.Certificate c : certificates) {
 
             if(c.getCertificateStatus().equals(CertificateStatus.VALID)) {
                 certificateDtos.add(modelMapper.map(c, CertificateDto.class));
@@ -160,19 +160,51 @@ public class CertificateService implements ICertificateService {
             keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
         }
 
-        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID);
+        tim26.bezbednost.model.Certificate certificate1 = new  tim26.bezbednost.model.Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID);
         certificateRepository.save(certificate1);
     }
 
     @Override
-    public List<Certificate> getAllRoots() {
+    public boolean revoke(CertificateX509NameDto certificateX509NameDto) {
 
-        List<Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
-        List<Certificate> returnlist = new ArrayList<>();
+        if(certificateX509NameDto.getCertificateRole() == CertificateRole.ROOT) {
+            Certificate certificate = keyStoreReader.readCertificate("./jks/root.jks", "root", certificateX509NameDto.getSerialNumber());
+            X509Certificate cert = (X509Certificate) certificate;
+
+            List<Certificate> certIntermediates = keyStoreReader.readAllCertificates("./jks/intermediate.jks", "intermediate".toCharArray());
+            List<Certificate> certsEnd =  keyStoreReader.readAllCertificates("./jks/end-entity.jks", "end-entity".toCharArray());
+
+            List<Certificate> all = new ArrayList<>();
+            all.addAll(certsEnd);
+            all.addAll(certIntermediates);
+
+
+            for(Certificate c : all){
+                X509Certificate x509Certificate = (X509Certificate) c;
+                if(((X509Certificate) c).getIssuerX500Principal().equals(certificateX509NameDto.getSerialNumber())) {
+                    tim26.bezbednost.model.Certificate certDb = certificateRepository.findBySerialNumber(certificateX509NameDto.getSerialNumber());
+                    List<tim26.bezbednost.model.Certificate> certificatesDb = certificateRepository.findAll();
+                    for(tim26.bezbednost.model.Certificate cDb : certificatesDb) {
+                        
+                    }
+                }
+            }
+
+        } else if(certificateX509NameDto.getCertificateRole() == CertificateRole.INTERMEDIATE) {
+            Certificate certificate = keyStoreReader.readCertificate("./jks/intermediate.jks", "intermediate", certificateX509NameDto.getSerialNumber());
+        } else if(certificateX509NameDto.getCertificateRole() == CertificateRole.ENDENTITY) {
+            Certificate certificate = keyStoreReader.readCertificate("./jks/end-entity.jks", "end-entity", certificateX509NameDto.getSerialNumber());
+        }
+        return false;
+    }
+    public List<tim26.bezbednost.model.Certificate> getAllRoots() {
+
+        List<tim26.bezbednost.model.Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
+        List<tim26.bezbednost.model.Certificate> returnlist = new ArrayList<>();
 
         if(certificates.size() != 0){
 
-            for(Certificate c : certificates){
+            for(tim26.bezbednost.model.Certificate c : certificates){
                 if(c.getCertificateStatus().equals(CertificateStatus.REVOKED)){
                     returnlist.add(c);
                 }
@@ -206,7 +238,7 @@ public class CertificateService implements ICertificateService {
                     if(certificateX509NameDto.getEndDate() == null){
                         certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
                     }
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
+                    certificateRepository.save(new  tim26.bezbednost.model.Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
 
                 } else {
 
@@ -227,7 +259,7 @@ public class CertificateService implements ICertificateService {
                         certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
                     }
 
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
+                    certificateRepository.save(new  tim26.bezbednost.model.Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
                 }
             }
         }
@@ -240,13 +272,13 @@ public class CertificateService implements ICertificateService {
         IssuerData issuer =  null;
         X509Certificate returnc = null;
 
-        List<Certificate> certsRoots = certificateRepository.findAllByRole(CertificateRole.ROOT);
-        List<Certificate> certIntermediates =  certificateRepository.findAllByRole(CertificateRole.INTERMEDIATE);
-        List<Certificate> all = new ArrayList<>();
+        List< tim26.bezbednost.model.Certificate> certsRoots = certificateRepository.findAllByRole(CertificateRole.ROOT);
+        List< tim26.bezbednost.model.Certificate> certIntermediates =  certificateRepository.findAllByRole(CertificateRole.INTERMEDIATE);
+        List< tim26.bezbednost.model.Certificate> all = new ArrayList<>();
         all.addAll(certsRoots);
         all.addAll(certIntermediates);
 
-        for(Certificate c : all) {
+        for( tim26.bezbednost.model.Certificate c : all) {
 
             if(c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
 
@@ -275,7 +307,7 @@ public class CertificateService implements ICertificateService {
                     certificatedto.setEndDate(certificatedto.getStartDate().plusYears(2));
                 }
 
-                certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID));
+                certificateRepository.save(new  tim26.bezbednost.model.Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID));
             }
         }
     }
@@ -283,14 +315,12 @@ public class CertificateService implements ICertificateService {
 
     public List<CertificateX509NameDto> getAllCACertificates() {
 
-        List<Certificate> allCA = certificateRepository.findAllByType(CertificateType.CA);
+        List< tim26.bezbednost.model.Certificate> allCA = certificateRepository.findAllByType(CertificateType.CA);
         List<CertificateX509NameDto> returns =  new ArrayList<>();
 
-        for(Certificate c : allCA){
-            if(c.getCertificateStatus().equals(CertificateStatus.VALID)){
-                CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
-                returns.add(dto);
-            }
+        for( tim26.bezbednost.model.Certificate c : allCA){
+            CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
+            returns.add(dto);
         }
 
         return returns;
