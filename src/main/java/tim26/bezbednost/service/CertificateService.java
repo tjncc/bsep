@@ -6,7 +6,6 @@ import org.bouncycastle.util.encoders.Base64Encoder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.security.provider.certpath.OCSP;
 import tim26.bezbednost.dto.CertificateDto;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
@@ -69,7 +68,7 @@ public class CertificateService implements ICertificateService {
         List< tim26.bezbednost.model.Certificate> certificates = certificateRepository.findAll();
         List<CertificateDto> certificateDtos = new ArrayList<CertificateDto>();
 
-        for (Certificate c : certificates) {
+        for (tim26.bezbednost.model.Certificate c : certificates) {
 
             if(c.getCertificateStatus().equals(CertificateStatus.VALID)) {
                 certificateDtos.add(modelMapper.map(c, CertificateDto.class));
@@ -198,14 +197,14 @@ public class CertificateService implements ICertificateService {
         }
         return false;
     }
-    public List<Certificate> getAllRoots() {
+    public List<tim26.bezbednost.model.Certificate> getAllRoots() {
 
-        List<Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
-        List<Certificate> returnlist = new ArrayList<>();
+        List<tim26.bezbednost.model.Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
+        List<tim26.bezbednost.model.Certificate> returnlist = new ArrayList<>();
 
         if(certificates.size() != 0){
 
-            for(Certificate c : certificates){
+            for(tim26.bezbednost.model.Certificate c : certificates){
                 if(c.getCertificateStatus().equals(CertificateStatus.REVOKED)){
                     returnlist.add(c);
                 }
