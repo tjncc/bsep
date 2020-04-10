@@ -9,7 +9,9 @@ import tim26.bezbednost.model.enumeration.CertificateRole;
 
 import javax.management.relation.Role;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.*;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
@@ -36,4 +38,6 @@ public interface ICertificateService {
     public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto,boolean isFristTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException;
 
     public List<Certificate> getAllRoots();
+    public boolean downloadCertificate(CertificateX509NameDto certificateX509NameDto) throws IOException, CertificateEncodingException;
+
 }

@@ -12,10 +12,12 @@ import tim26.bezbednost.model.enumeration.CertificateType;
 import tim26.bezbednost.service.ICertificateService;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
 import java.util.List;
@@ -57,7 +59,17 @@ public class CertificateController {
         }
         else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+          }
+        }
 
+    @RequestMapping(method = RequestMethod.POST, value="/download")
+    public ResponseEntity download(@RequestBody CertificateX509NameDto certificateX509NameDto) throws IOException, CertificateEncodingException {
+        boolean isTrue = certificateService.downloadCertificate(certificateX509NameDto);
+
+        if(isTrue) {
+            return new ResponseEntity<>(HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
 
