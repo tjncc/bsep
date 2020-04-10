@@ -87,8 +87,6 @@ public class CertificateService implements ICertificateService {
             keyPair = certificateGenerator.generateKeyPair(true);
         }
 
-        PublicKey pk = keyPair.getPublic();
-
         subjectData.setPublicKey(keyPair.getPublic());
         subjectData.setPrivateKey(keyPair.getPrivate());
 
