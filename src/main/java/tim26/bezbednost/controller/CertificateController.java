@@ -59,4 +59,10 @@ public class CertificateController {
         }
     }
 
+    @RequestMapping(method = RequestMethod.POST, value="/revoke")
+    public ResponseEntity<CertificateX509NameDto> revoke(@RequestBody CertificateX509NameDto certificateX509NameDto) {
+        return new ResponseEntity<>(certificateX509NameDto, HttpStatus.OK);
+    }
+
+
 }
