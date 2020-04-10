@@ -53,7 +53,7 @@ public class KeyStoreService implements IKeyStoreService {
         } else if(role.equals(CertificateRole.ENDENTITY)){
             keyStoreWriter.loadKeyStore("./jks/end-entity.jks", "end-entity".toCharArray());
             keyStoreWriter.write(alias, privateKey, "end-entity".toCharArray(), certificate);
-            keyStoreWriter.saveKeyStore("./jks/intermediate.jks", "end-entity".toCharArray());
+            keyStoreWriter.saveKeyStore("./jks/end-entity.jks", "end-entity".toCharArray());
         }
     }
 
