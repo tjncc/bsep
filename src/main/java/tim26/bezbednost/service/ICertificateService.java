@@ -35,4 +35,5 @@ public interface ICertificateService {
     public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto,boolean isFristTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException;
 
 
+    boolean revoke(CertificateX509NameDto certificateX509NameDto);
 }

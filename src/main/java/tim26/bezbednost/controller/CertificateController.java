@@ -48,7 +48,10 @@ public class CertificateController {
 
     @RequestMapping(method = RequestMethod.POST, value="/revoke")
     public ResponseEntity<CertificateX509NameDto> revoke(@RequestBody CertificateX509NameDto certificateX509NameDto) {
-        return new ResponseEntity<>(certificateX509NameDto, HttpStatus.OK);
+        if(certificateService.revoke(certificateX509NameDto))
+            return new ResponseEntity<>(HttpStatus.OK);
+        else
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
 
