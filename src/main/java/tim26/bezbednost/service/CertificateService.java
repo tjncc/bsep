@@ -398,14 +398,14 @@ public class CertificateService implements ICertificateService {
 
         Random rand = new Random();
         int serialNumber = rand.nextInt(10000);
-        String StringSerialNumber = String.valueOf(serialNumber);
+        String stringSerialNumber = String.valueOf(serialNumber);
 
-        while(certificateRepository.findBySerialNumber(StringSerialNumber) != null) {
+        while(certificateRepository.findBySerialNumber(stringSerialNumber) != null) {
             serialNumber = rand.nextInt(10000);
-            StringSerialNumber = String.valueOf(serialNumber);
+            stringSerialNumber = String.valueOf(serialNumber);
         }
 
-        return  StringSerialNumber;
+        return  stringSerialNumber;
     }
 
 
