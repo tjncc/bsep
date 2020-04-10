@@ -2,6 +2,7 @@ package tim26.bezbednost.service;
 
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.util.encoders.Base64Encoder;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,24 +18,25 @@ import tim26.bezbednost.model.enumeration.CertificateRole;
 import tim26.bezbednost.model.enumeration.CertificateStatus;
 import tim26.bezbednost.model.enumeration.CertificateType;
 import tim26.bezbednost.repository.CertificateRepository;
-import tim26.bezbednost.repository.KeyStoreRepository;
 
 
 import javax.annotation.PostConstruct;
-import javax.management.relation.Role;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyPair;
 import java.security.SecureRandom;
+import java.security.cert.CertificateEncodingException;
 import java.time.LocalDate;
 import java.security.*;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.*;
 
 @Service
 public class CertificateService implements ICertificateService {
@@ -67,8 +69,11 @@ public class CertificateService implements ICertificateService {
         List< tim26.bezbednost.model.Certificate> certificates = certificateRepository.findAll();
         List<CertificateDto> certificateDtos = new ArrayList<CertificateDto>();
 
-        for ( tim26.bezbednost.model.Certificate c : certificates) {
-            certificateDtos.add(modelMapper.map(c, CertificateDto.class));
+        for (Certificate c : certificates) {
+
+            if(c.getCertificateStatus().equals(CertificateStatus.VALID)) {
+                certificateDtos.add(modelMapper.map(c, CertificateDto.class));
+            }
         }
 
         return certificateDtos;
@@ -193,6 +198,21 @@ public class CertificateService implements ICertificateService {
         }
         return false;
     }
+    public List<Certificate> getAllRoots() {
+
+        List<Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
+        List<Certificate> returnlist = new ArrayList<>();
+
+        if(certificates.size() != 0){
+
+            for(Certificate c : certificates){
+                if(c.getCertificateStatus().equals(CertificateStatus.REVOKED)){
+                    returnlist.add(c);
+                }
+            }
+        }
+        return returnlist;
+    }
 
 
     public void generateCACertificate(CertificateX509NameDto certificateX509NameDto, String alias, boolean isFirstTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
@@ -201,7 +221,7 @@ public class CertificateService implements ICertificateService {
         List<CertificateDto> certificateDtoList = findAll();
 
         for (CertificateDto c : certificateDtoList) {
-            if (c.getSerialNumber().equals(alias)) {
+            if (c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
                 if (c.getCertificateRole() == CertificateRole.ROOT) {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
@@ -261,7 +281,7 @@ public class CertificateService implements ICertificateService {
 
         for( tim26.bezbednost.model.Certificate c : all) {
 
-            if(c.getSerialNumber().equals(alias)) {
+            if(c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
 
                 try
                 {
@@ -346,6 +366,33 @@ public class CertificateService implements ICertificateService {
         }
     }
 
+    @Override
+    public boolean downloadCertificate(CertificateX509NameDto certificateX509NameDto) throws IOException, CertificateEncodingException {
+
+        java.security.cert.Certificate certificate;
+
+        if(certificateX509NameDto.getCertificateRole().equals(CertificateRole.ROOT)){
+            certificate = keyStoreReader.readCertificate("./jks/root.jks", "root", certificateX509NameDto.getSerialNumber());
+        } else if (certificateX509NameDto.getCertificateRole().equals(CertificateRole.INTERMEDIATE)) {
+            certificate = keyStoreReader.readCertificate("./jks/intermediate.jks", "intermediate", certificateX509NameDto.getSerialNumber());
+        } else if (certificateX509NameDto.getCertificateRole().equals(CertificateRole.ENDENTITY)) {
+            certificate = keyStoreReader.readCertificate("./jks/end-entity.jks", "end-entity", certificateX509NameDto.getSerialNumber());
+        } else {
+            return false;
+        }
+
+        X509Certificate x509Certificate = (X509Certificate) certificate;
+
+        FileOutputStream os = new FileOutputStream("./downloads/" + x509Certificate.getSerialNumber() + ".cer");
+        os.write("-----------------------\n".getBytes());
+        os.write((x509Certificate.getType().toString() +  " CERTIFICATE " + x509Certificate.getSerialNumber() + "\n\n").getBytes());
+        os.write(Base64.getEncoder().encode(x509Certificate.getEncoded()));
+        os.write("\n-----------------------\n".getBytes());
+        os.close();
+
+        return true;
+    }
+
 
     @Override
     public String generateSerialNumber() {
@@ -364,4 +411,3 @@ public class CertificateService implements ICertificateService {
 
 
 }
-
