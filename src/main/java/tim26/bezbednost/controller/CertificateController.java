@@ -46,5 +46,10 @@ public class CertificateController {
         return new ResponseEntity<>(certificateService.findAll(), HttpStatus.OK);
     }
 
+    @RequestMapping(method = RequestMethod.POST, value="/download")
+    public ResponseEntity download(@RequestBody String serialNumber) {
+        
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }

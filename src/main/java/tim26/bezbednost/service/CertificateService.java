@@ -311,6 +311,12 @@ public class CertificateService implements ICertificateService {
         }
     }
 
+    @Override
+    public boolean downloadCertificate(String serialNumber) {
+        
+        return false;
+    }
+
 
     @Override
     public String generateSerialNumber() {

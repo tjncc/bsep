@@ -34,5 +34,6 @@ public interface ICertificateService {
 
     public void generateSelfSignedCertificate(CertificateX509NameDto certificateX509NameDto,boolean isFristTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException;
 
+    public boolean downloadCertificate(String serialNumber);
 
 }
