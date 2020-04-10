@@ -36,9 +36,6 @@ public class KeyStoreService implements IKeyStoreService {
     @Autowired
     private CertificateService certificateService;
 
-    @Autowired
-    private CertificateGenerator certificateGenerator;
-
 
     public void saveCertificateToKeyStore(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role) {
 
@@ -84,7 +81,7 @@ public class KeyStoreService implements IKeyStoreService {
     }
 
 
-    public List<X509Certificate> findKeyStoreCertificatesByRole(CertificateRole role) throws FileNotFoundException {
+    public List<X509Certificate> findKeyStoreCertificatesByRole(CertificateRole role) {
 
         List<X509Certificate> returnlist = new ArrayList<>();
 
@@ -92,18 +89,15 @@ public class KeyStoreService implements IKeyStoreService {
 
             List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("./jks/root.jks", "root".toCharArray());
 
-
             for(Certificate c : certificates){
                 X509Certificate cert = (X509Certificate)c;
                 returnlist.add(cert);
             }
-
             return returnlist;
 
         } else if(role.equals(CertificateRole.INTERMEDIATE)){
 
             List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("./jks/intermediate.jks", "intermediate".toCharArray());
-
 
             for(Certificate c : certificates){
                 X509Certificate cert = (X509Certificate)c;
@@ -113,7 +107,6 @@ public class KeyStoreService implements IKeyStoreService {
 
 
         } else if (role.equals(CertificateRole.ENDENTITY)){
-
 
             List<Certificate> certificates =  this.keyStoreReader.readAllCertificates("./jks/end-entity.jks", "end-entity".toCharArray());
 
@@ -125,12 +118,10 @@ public class KeyStoreService implements IKeyStoreService {
         }
 
         return returnlist;
-
     }
 
-    public void generateRootKeyStore() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
 
-        //keyStoreWriter.loadKeyStore(null, "root".toCharArray());
+    public void generateRootKeyStore() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
 
         CertificateX509NameDto certificatedto = new CertificateX509NameDto();
         certificatedto.setCommonName("*.triof.org");
@@ -146,38 +137,8 @@ public class KeyStoreService implements IKeyStoreService {
         certificatedto.setStartDate(startDate);
         certificatedto.setEndDate(endDate);
 
-        //????
-        //certificatedto.setSerialNumber("345");
-
         certificateService.generateSelfSignedCertificate(certificatedto,true);
-
-
-
-        //keyStoreWriter.saveKeyStore("./jks/root.jks","root".toCharArray());
-
-    }
-/*
-    public void generateIntermediateKeyStore(String alias, CertificateX509NameDto certificatedto, boolean isCA) throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException, FileNotFoundException {
-
-        //keyStoreWriter.loadKeyStore(null, "intermediate".toCharArray());
-        if(isCA) {
-            certificateService.generateCACertificate(certificatedto, alias,true);
-        } else {
-            certificateService.generateCertificateNotCA(certificatedto, alias,true);
-        }
-
-        //keyStoreWriter.saveKeyStore("./jks/intermediate.jks", "intermediate".toCharArray());
-
     }
 
-    public void generateEndEntityKeyStore(String alias, CertificateX509NameDto certificatedto) throws FileNotFoundException {
 
-        //keyStoreWriter.loadKeyStore(null, "end-entity".toCharArray());
-        certificateService.generateCertificateNotCA(certificatedto,alias,true);
-        //keyStoreWriter.saveKeyStore("./jks/end-entity.jks","end-entity".toCharArray());
-
-
-    }
-*/
-
-    }
+}
