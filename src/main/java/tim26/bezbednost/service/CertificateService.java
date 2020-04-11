@@ -167,22 +167,26 @@ public class CertificateService implements ICertificateService {
     @Override
     public boolean revoke(CertificateX509NameDto certificateX509NameDto) {
 
+        Certificate certDb = certificateRepository.findBySerialNumber(certificateX509NameDto.getSerialNumber());
+        certDb.setCertificateStatus(CertificateStatus.REVOKED);
+
         if(certificateX509NameDto.getCertificateRole() == CertificateRole.ROOT) {
             java.security.cert.Certificate certificate = keyStoreReader.readCertificate("./jks/root.jks", "root", certificateX509NameDto.getSerialNumber());
             X509Certificate cert = (X509Certificate) certificate;
 
             List<java.security.cert.Certificate> certIntermediates = keyStoreReader.readAllCertificates("./jks/intermediate.jks", "intermediate".toCharArray());
             List<java.security.cert.Certificate> certsEnd =  keyStoreReader.readAllCertificates("./jks/end-entity.jks", "end-entity".toCharArray());
-
             List<java.security.cert.Certificate> all = new ArrayList<>();
+
             all.addAll(certsEnd);
             all.addAll(certIntermediates);
-
 
             for(java.security.cert.Certificate c : all){
                 X509Certificate x509Certificate = (X509Certificate) c;
                 if(((X509Certificate) c).getIssuerX500Principal().equals(certificateX509NameDto.getSerialNumber())) {
-                    Certificate certDb = certificateRepository.findBySerialNumber(certificateX509NameDto.getSerialNumber());
+                    Certificate certificate1 = certificateRepository.findBySerialNumber(x509Certificate.getSerialNumber().toString());
+                    certificate1.setCertificateStatus(CertificateStatus.REVOKED);
+
                     List<Certificate> certificatesDb = certificateRepository.findAll();
                     for(Certificate cDb : certificatesDb) {
                         
