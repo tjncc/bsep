@@ -169,6 +169,7 @@ public class CertificateService implements ICertificateService {
 
         Certificate certDb = certificateRepository.findBySerialNumber(certificateX509NameDto.getSerialNumber());
         certDb.setCertificateStatus(CertificateStatus.REVOKED);
+        certificateRepository.save(certDb);
 
         //ako je end-entity unistava se samo on i ne ide dalje
         if(certificateX509NameDto.getCertificateRole().equals(CertificateRole.ENDENTITY)) {
@@ -182,15 +183,17 @@ public class CertificateService implements ICertificateService {
             for(Certificate c : all){
                 Certificate certificate1 = certificateRepository.findBySerialNumber(c.getSerialNumber());
                 certificate1.setCertificateStatus(CertificateStatus.REVOKED);
+                certificateRepository.save(certificate1);
             }
             return true;
 
         } else if(certificateX509NameDto.getCertificateRole() == CertificateRole.INTERMEDIATE) {
 
             for(Certificate c : all) {
-                Certificate certificate1 = certificateRepository.findBySerialNumber(c.getSerialNumber());
-                if(c.getCode().contains(certificate1.getCode())){
+                //Certificate certificate1 = certificateRepository.findBySerialNumber(c.getSerialNumber());
+                if(c.getCode().contains(certDb.getCode())){
                     c.setCertificateStatus(CertificateStatus.REVOKED);
+                    certificateRepository.save(c);
                 }
             }
             return true;
@@ -326,8 +329,11 @@ public class CertificateService implements ICertificateService {
         List<CertificateX509NameDto> returns =  new ArrayList<>();
 
         for(Certificate c : allCA){
-            CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
-            returns.add(dto);
+            if(c.getCertificateStatus().equals(CertificateStatus.VALID)){
+                CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
+                returns.add(dto);
+            }
+
         }
 
         return returns;
