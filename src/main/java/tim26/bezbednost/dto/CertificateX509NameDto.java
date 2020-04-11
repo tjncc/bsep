@@ -19,6 +19,7 @@ public class CertificateX509NameDto {
     private CertificateRole certificateRole;
     private String issuerSerialNumber;
     private CertificateType subjectType;
+    private String code;
 
     public CertificateX509NameDto() {
 
@@ -118,5 +119,13 @@ public class CertificateX509NameDto {
 
     public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 }
