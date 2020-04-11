@@ -173,7 +173,7 @@ public class CertificateService implements ICertificateService {
         if(certificates.size() != 0){
 
             for(Certificate c : certificates){
-                if(c.getCertificateStatus().equals(CertificateStatus.REVOKED)){
+                if(c.getCertificateStatus().equals(CertificateStatus.VALID)){
                     returnlist.add(c);
                 }
             }

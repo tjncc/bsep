@@ -55,10 +55,10 @@ public class CertificateController {
     public ResponseEntity<?> getRoots() {
         List<Certificate> certificates = certificateService.getAllRoots();
         if(certificates.size() != 0) {
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         else {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(HttpStatus.OK);
           }
         }
 
