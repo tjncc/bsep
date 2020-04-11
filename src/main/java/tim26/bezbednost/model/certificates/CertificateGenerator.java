@@ -84,9 +84,8 @@ public class  CertificateGenerator {
     public KeyPair generateKeyPair(boolean isCertificateAuthority) {
         try {
             KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
-            SecureRandom random = new SecureRandom();
-
-            //CA keysize is bigger for more secure private key
+            SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+            
             if(isCertificateAuthority) {
                 keyGen.initialize(4096, random);
             } else {
@@ -94,7 +93,7 @@ public class  CertificateGenerator {
             }
             return keyGen.generateKeyPair();
 
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
             e.printStackTrace();
         }
 

@@ -26,7 +26,7 @@ public class Certificate  implements Serializable {
     @Column(name="serialNumber", unique = true)
     private String serialNumber;
 
-    @Column(name="commonName", unique = true)
+    @Column(name="commonName")
     private String commonName;
 
     @Column(name = "validto")
@@ -38,6 +38,12 @@ public class Certificate  implements Serializable {
     @Column(name = "status")
     private CertificateStatus certificateStatus;
 
+    @Column(name = "code")
+    private String code;
+
+    @Column(name = "children")
+    private int children;
+
     public Certificate() {
     }
 
@@ -48,7 +54,7 @@ public class Certificate  implements Serializable {
         this.commonName = commonName;
     }
 
-    public Certificate(String serialNumber, CertificateRole certificateRole,CertificateType type,String commonName, LocalDate validFrom, LocalDate validTo, CertificateStatus certificateStatus) {
+    public Certificate(String serialNumber, CertificateRole certificateRole,CertificateType type,String commonName, LocalDate validFrom, LocalDate validTo, CertificateStatus certificateStatus,int children, String code) {
         this.serialNumber = serialNumber;
         this.role = certificateRole;
         this.type = type;
@@ -56,6 +62,8 @@ public class Certificate  implements Serializable {
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.certificateStatus = certificateStatus;
+        this.children = children;
+        this.code = code;
     }
 
 
@@ -122,4 +130,22 @@ public class Certificate  implements Serializable {
     public void setCertificateStatus(CertificateStatus certificateStatus) {
         this.certificateStatus = certificateStatus;
     }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getChildren() {
+        return children;
+    }
+
+    public void setChildren(int children) {
+        this.children = children;
+    }
+
+
 }

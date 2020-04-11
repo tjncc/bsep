@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import tim26.bezbednost.dto.CertificateDto;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
-import tim26.bezbednost.model.Certificate;
 import tim26.bezbednost.model.certificates.CertificateGenerator;
 import tim26.bezbednost.model.certificates.IssuerData;
 import tim26.bezbednost.model.certificates.SubjectData;
+import tim26.bezbednost.model.Certificate;
 import tim26.bezbednost.model.enumeration.CertificateRole;
 import tim26.bezbednost.model.enumeration.CertificateStatus;
 import tim26.bezbednost.model.enumeration.CertificateType;
@@ -160,11 +160,49 @@ public class CertificateService implements ICertificateService {
             keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
         }
 
-        Certificate certificate1 = new Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID);
+        Certificate certificate1 = new  Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID,0,"1");
         certificateRepository.save(certificate1);
     }
 
     @Override
+    public boolean revoke(CertificateX509NameDto certificateX509NameDto) {
+
+        Certificate certDb = certificateRepository.findBySerialNumber(certificateX509NameDto.getSerialNumber());
+        certDb.setCertificateStatus(CertificateStatus.REVOKED);
+        certificateRepository.save(certDb);
+
+        //ako je end-entity unistava se samo on i ne ide dalje
+        if(certificateX509NameDto.getCertificateRole().equals(CertificateRole.ENDENTITY)) {
+            return true;
+        }
+
+        List<Certificate> all = certificateRepository.findAll();
+
+        if(certificateX509NameDto.getCertificateRole() == CertificateRole.ROOT) {
+            //unistavaju se svi
+            for(Certificate c : all){
+                Certificate certificate1 = certificateRepository.findBySerialNumber(c.getSerialNumber());
+                certificate1.setCertificateStatus(CertificateStatus.REVOKED);
+                certificateRepository.save(certificate1);
+            }
+            return true;
+
+        } else if(certificateX509NameDto.getCertificateRole() == CertificateRole.INTERMEDIATE) {
+
+            for(Certificate c : all) {
+                //Certificate certificate1 = certificateRepository.findBySerialNumber(c.getSerialNumber());
+                if(c.getCode().contains(certDb.getCode())){
+                    c.setCertificateStatus(CertificateStatus.REVOKED);
+                    certificateRepository.save(c);
+                }
+            }
+            return true;
+        }
+        return false;
+    }
+
+
+
     public List<Certificate> getAllRoots() {
 
         List<Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
@@ -185,11 +223,14 @@ public class CertificateService implements ICertificateService {
     public void generateCACertificate(CertificateX509NameDto certificateX509NameDto, String alias, boolean isFirstTime) throws NoSuchProviderException, CertificateException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, ParseException {
 
         SubjectData subject = generateSubjectData(certificateX509NameDto);
-        List<CertificateDto> certificateDtoList = findAll();
+        List<Certificate> certificateDtoList = certificateRepository.findAll();
 
-        for (CertificateDto c : certificateDtoList) {
+        for (Certificate c : certificateDtoList) {
             if (c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
-                if (c.getCertificateRole() == CertificateRole.ROOT) {
+
+                c.setChildren(c.getChildren()+1);
+
+                if (c.getRole() == CertificateRole.ROOT) {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
                             c.getSerialNumber(), "root".toCharArray(),
@@ -206,7 +247,7 @@ public class CertificateService implements ICertificateService {
                     if(certificateX509NameDto.getEndDate() == null){
                         certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
                     }
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID, 0,c.getCode() + c.getChildren()));
 
                 } else {
 
@@ -227,7 +268,7 @@ public class CertificateService implements ICertificateService {
                         certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
                     }
 
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID));
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID,0,c.getCode() + c.getChildren()));
                 }
             }
         }
@@ -250,6 +291,7 @@ public class CertificateService implements ICertificateService {
 
             if(c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
 
+                c.setChildren(c.getChildren()+1);
                 try
                 {
                     issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
@@ -275,7 +317,7 @@ public class CertificateService implements ICertificateService {
                     certificatedto.setEndDate(certificatedto.getStartDate().plusYears(2));
                 }
 
-                certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID));
+                certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID, 0, c.getCode() + c.getChildren()));
             }
         }
     }
@@ -291,6 +333,7 @@ public class CertificateService implements ICertificateService {
                 CertificateX509NameDto dto = modelMapper.map(c,CertificateX509NameDto.class);
                 returns.add(dto);
             }
+
         }
 
         return returns;
@@ -368,14 +411,14 @@ public class CertificateService implements ICertificateService {
 
         Random rand = new Random();
         int serialNumber = rand.nextInt(10000);
-        String StringSerialNumber = String.valueOf(serialNumber);
+        String stringSerialNumber = String.valueOf(serialNumber);
 
-        while(certificateRepository.findBySerialNumber(StringSerialNumber) != null) {
+        while(certificateRepository.findBySerialNumber(stringSerialNumber) != null) {
             serialNumber = rand.nextInt(10000);
-            StringSerialNumber = String.valueOf(serialNumber);
+            stringSerialNumber = String.valueOf(serialNumber);
         }
 
-        return  StringSerialNumber;
+        return  stringSerialNumber;
     }
 
 

@@ -13,6 +13,8 @@ public class CertificateDto {
     private CertificateStatus certificateStatus;
     private LocalDate validFrom;
     private LocalDate validTo;
+    private String code;
+    private int children;
 
     public CertificateDto() {
 
@@ -64,5 +66,21 @@ public class CertificateDto {
 
     public void setValidTo(LocalDate validTo) {
         this.validTo = validTo;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public int getChildren() {
+        return children;
+    }
+
+    public void setChildren(int children) {
+        this.children = children;
     }
 }
