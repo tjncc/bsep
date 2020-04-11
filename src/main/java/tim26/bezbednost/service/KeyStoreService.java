@@ -124,7 +124,7 @@ public class KeyStoreService implements IKeyStoreService {
     public void generateRootKeyStore() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
 
         CertificateX509NameDto certificatedto = new CertificateX509NameDto();
-        certificatedto.setCommonName("*.triof.org");
+        certificatedto.setCommonName("Triof");
         certificatedto.setOrganization("TrioF organization");
         certificatedto.setOrganizationUnit("Software development unit");
         certificatedto.setCity("Novi Sad");
