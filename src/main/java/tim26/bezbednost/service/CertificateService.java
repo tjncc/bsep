@@ -209,6 +209,19 @@ public class CertificateService implements ICertificateService {
         return false;
     }
 
+    @Override
+    public List<CertificateDto> findAllRevoked() {
+        List<Certificate> certificates = certificateRepository.findAll();
+
+        List<CertificateDto> certificateDtos = new ArrayList<CertificateDto>();
+
+        for (Certificate c : certificates) {
+            if(c.getCertificateStatus() == CertificateStatus.REVOKED)
+            certificateDtos.add(modelMapper.map(c, CertificateDto.class));
+        }
+
+        return certificateDtos;
+    }
 
 
     public List<Certificate> getAllRoots() {

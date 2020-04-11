@@ -41,4 +41,6 @@ public interface ICertificateService {
     public boolean downloadCertificate(CertificateX509NameDto certificateX509NameDto) throws IOException, CertificateEncodingException;
 
     boolean revoke(CertificateX509NameDto certificateX509NameDto);
+
+    public List<CertificateDto> findAllRevoked();
 }
