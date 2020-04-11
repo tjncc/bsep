@@ -20,6 +20,7 @@ import java.security.SignatureException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -83,8 +84,15 @@ public class CertificateController {
 
     @RequestMapping(method = RequestMethod.POST, value="/saveroot")
     public ResponseEntity<?> saveRoot(@RequestBody CertificateX509NameDto certificateX509NameDto) throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException {
+
         certificateX509NameDto.setSubjectType(CertificateType.CA);
         certificateX509NameDto.setCertificateRole(CertificateRole.ROOT);
+
+        LocalDate startDate = LocalDate.now();
+        LocalDate endDate = startDate.plusYears(10);
+        certificateX509NameDto.setStartDate(startDate);
+        certificateX509NameDto.setEndDate(endDate);
+        
         certificateService.generateSelfSignedCertificate(certificateX509NameDto,false);
         return new ResponseEntity<>(HttpStatus.OK);
     }
