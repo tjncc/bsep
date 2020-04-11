@@ -160,7 +160,15 @@ public class CertificateService implements ICertificateService {
             keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
         }
 
-        Certificate certificate1 = new  Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID,0,"1");
+        int roots = 1;
+        List<Certificate> allC = certificateRepository.findAllByRole(CertificateRole.ROOT);
+        if(allC.isEmpty()){
+            roots = 1;
+        } else {
+            roots = allC.size() + 1;
+        }
+
+        Certificate certificate1 = new  Certificate(subject.getSerialNumber(), CertificateRole.ROOT,CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID,0, String.valueOf(roots));
         certificateRepository.save(certificate1);
     }
 
