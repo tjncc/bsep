@@ -43,4 +43,6 @@ public interface ICertificateService {
     boolean revoke(CertificateX509NameDto certificateX509NameDto);
 
     public List<CertificateDto> findAllRevoked();
+
+    public void checkEndDate(Certificate certificate);
 }

@@ -239,7 +239,6 @@ public class CertificateService implements ICertificateService {
         return certificateDtos;
     }
 
-
     public List<Certificate> getAllRoots() {
 
         List<Certificate> certificates = certificateRepository.findAllByRole(CertificateRole.ROOT);
@@ -449,6 +448,18 @@ public class CertificateService implements ICertificateService {
 
         return  stringSerialNumber;
     }
+
+
+    @Override
+    public void checkEndDate(Certificate certificate) {
+        LocalDate today = LocalDate.now();
+
+        if(certificate.getValidTo().compareTo(today) > 0 || certificate.getValidTo().compareTo(today) == 0){
+            CertificateX509NameDto certificateX509NameDto = modelMapper.map(certificate, CertificateX509NameDto.class);
+            revoke(certificateX509NameDto);
+        }
+    }
+
 
 
 }
