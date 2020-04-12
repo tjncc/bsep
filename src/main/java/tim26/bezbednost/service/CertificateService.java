@@ -95,14 +95,30 @@ public class CertificateService implements ICertificateService {
         subjectData.setPublicKey(keyPair.getPublic());
         subjectData.setPrivateKey(keyPair.getPrivate());
 
+        Certificate issuerCert = null;
+        if(!certificateDto.getCertificateRole().equals(CertificateRole.ROOT)) {
+            issuerCert = certificateRepository.findBySerialNumber(certificateDto.getIssuerSerialNumber());
+        }
         LocalDate startDate = LocalDate.now();
         LocalDate endDate;
+
         if(certificateDto.getCertificateRole().equals(CertificateRole.ROOT)){
             endDate = startDate.plusYears(10);
+
         } else if (certificateDto.getCertificateRole().equals(CertificateRole.INTERMEDIATE)){
-            endDate = startDate.plusYears(5);
+
+            if(issuerCert.getValidTo().compareTo(startDate.plusYears(5)) < 0) {
+                endDate = issuerCert.getValidTo();
+            } else {
+                endDate = startDate.plusYears(5);
+            }
         } else {
-            endDate = startDate.plusYears(2);
+
+            if(issuerCert.getValidTo().compareTo(startDate.plusYears(2)) < 0) {
+                endDate = issuerCert.getValidTo();
+            } else {
+                endDate = startDate.plusYears(2);
+            }
         }
 
         subjectData.setStartDate(startDate);
@@ -255,7 +271,7 @@ public class CertificateService implements ICertificateService {
                     if(certificateX509NameDto.getEndDate() == null){
                         certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
                     }
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID, 0,c.getCode() + c.getChildren()));
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), subject.getStartDate(), subject.getEndDate(), CertificateStatus.VALID, 0,c.getCode() + c.getChildren()));
 
                 } else {
 
@@ -272,11 +288,7 @@ public class CertificateService implements ICertificateService {
                         keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
                     }
 
-                    if(certificateX509NameDto.getEndDate() == null){
-                        certificateX509NameDto.setEndDate(certificateX509NameDto.getStartDate().plusYears(5));
-                    }
-
-                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), certificateX509NameDto.getStartDate(), certificateX509NameDto.getEndDate(), CertificateStatus.VALID,0,c.getCode() + c.getChildren()));
+                    certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), subject.getStartDate(), subject.getEndDate(), CertificateStatus.VALID,0,c.getCode() + c.getChildren()));
                 }
             }
         }
@@ -321,11 +333,7 @@ public class CertificateService implements ICertificateService {
                     keyStoreService.saveWhenKeyStoreIsGenerating(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
                 }
 
-                if(certificatedto.getEndDate() == null){
-                    certificatedto.setEndDate(certificatedto.getStartDate().plusYears(2));
-                }
-
-                certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), certificatedto.getStartDate(), certificatedto.getEndDate(), CertificateStatus.VALID, 0, c.getCode() + c.getChildren()));
+                certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), subject.getStartDate(), subject.getEndDate(), CertificateStatus.VALID, 0, c.getCode() + c.getChildren()));
             }
         }
     }
