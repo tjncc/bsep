@@ -20,8 +20,7 @@ public class CertificateX509NameDto {
     private String issuerSerialNumber;
     private CertificateType subjectType;
     private String code;
-    private KeyUsageDto keyUsageDto;
-    private ExtendedKeyUsageDto extendedKeyUsageDto;
+    private ExstensionsDto exstensionsDto;
 
     public CertificateX509NameDto() {
 
@@ -131,19 +130,11 @@ public class CertificateX509NameDto {
         this.code = code;
     }
 
-    public KeyUsageDto getKeyUsageDto() {
-        return keyUsageDto;
+    public ExstensionsDto getExstensionsDto() {
+        return exstensionsDto;
     }
 
-    public void setKeyUsageDto(KeyUsageDto keyUsageDto) {
-        this.keyUsageDto = keyUsageDto;
-    }
-
-    public ExtendedKeyUsageDto getExtendedKeyUsageDto() {
-        return extendedKeyUsageDto;
-    }
-
-    public void setExtendedKeyUsageDto(ExtendedKeyUsageDto extendedKeyUsageDto) {
-        this.extendedKeyUsageDto = extendedKeyUsageDto;
+    public void setExstensionsDto(ExstensionsDto exstensionsDto) {
+        this.exstensionsDto = exstensionsDto;
     }
 }
