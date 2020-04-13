@@ -53,6 +53,11 @@ public class CertificateController {
         return new ResponseEntity<>(certificateService.findAll(), HttpStatus.OK);
     }
 
+    @RequestMapping(method = RequestMethod.GET, value="/allrevoked")
+    public ResponseEntity<List<CertificateDto>> getAllRevoked() {
+        return new ResponseEntity<>(certificateService.findAllRevoked(), HttpStatus.OK);
+    }
+
     @RequestMapping(method = RequestMethod.GET, value="/checkroot")
     public ResponseEntity<?> getRoots() {
         List<Certificate> certificates = certificateService.getAllRoots();
