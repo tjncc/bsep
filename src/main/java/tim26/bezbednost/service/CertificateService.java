@@ -423,11 +423,10 @@ public class CertificateService implements ICertificateService {
 
         X509Certificate x509Certificate = (X509Certificate) certificate;
 
-        FileOutputStream os = new FileOutputStream("./downloads/" + x509Certificate.getSerialNumber() + ".cer");
-        os.write("-----------------------\n".getBytes());
-        os.write((x509Certificate.getType().toString() +  " CERTIFICATE " + x509Certificate.getSerialNumber() + "\n\n").getBytes());
+        FileOutputStream os = new FileOutputStream("./downloads/" + x509Certificate.getSerialNumber() + ".crt");
+        os.write("-----BEGIN CERTIFICATE-----\n".getBytes());
         os.write(Base64.getEncoder().encode(x509Certificate.getEncoded()));
-        os.write("\n-----------------------\n".getBytes());
+        os.write("\n-----END CERTIFICATE-----\n".getBytes());
         os.close();
 
         return true;
