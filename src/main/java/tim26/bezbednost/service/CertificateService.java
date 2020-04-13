@@ -169,7 +169,7 @@ public class CertificateService implements ICertificateService {
         SubjectData subject = generateSubjectData(certificateX509NameDto);
         IssuerData issuer = generateIssuerData(certificateX509NameDto, subject.getPrivateKey());
 
-        X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true,certificateX509NameDto.getKeyUsageDto());
+        X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true,certificateX509NameDto.getExstensionsDto());
         certificate.verify(subject.getPublicKey());
 
         if(isFirstTime) {
@@ -274,7 +274,7 @@ public class CertificateService implements ICertificateService {
                             c.getSerialNumber(), "root".toCharArray(),
                             "root".toCharArray());
 
-                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true,certificateX509NameDto.getKeyUsageDto());
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true,certificateX509NameDto.getExstensionsDto());
 
 
                     if(isFirstTime){
@@ -295,7 +295,7 @@ public class CertificateService implements ICertificateService {
                             "intermediate".toCharArray(),
                             "intermediate".toCharArray());
 
-                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true,certificateX509NameDto.getKeyUsageDto());
+                    X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true,certificateX509NameDto.getExstensionsDto());
 
                     if(isFirstTime){
                         keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
@@ -340,7 +340,7 @@ public class CertificateService implements ICertificateService {
                             "intermediate".toCharArray());
                 }
 
-                returnc = certificateGenerator.generateCertificate(subject, issuer,false,certificatedto.getKeyUsageDto());
+                returnc = certificateGenerator.generateCertificate(subject, issuer,false,certificatedto.getExstensionsDto());
 
 
                 if(isFristTime == false){
