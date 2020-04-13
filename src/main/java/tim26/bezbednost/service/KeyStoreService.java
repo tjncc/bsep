@@ -1,19 +1,13 @@
 package tim26.bezbednost.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import sun.security.krb5.internal.crypto.KeyUsage;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
 import tim26.bezbednost.keystore.KeyStoreWriter;
-import tim26.bezbednost.model.certificates.CertificateGenerator;
-import tim26.bezbednost.model.certificates.IssuerData;
-import tim26.bezbednost.model.certificates.SubjectData;
 import tim26.bezbednost.model.enumeration.CertificateRole;
 
-import java.io.FileNotFoundException;
-import java.math.BigInteger;
 import java.security.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
@@ -138,6 +132,16 @@ public class KeyStoreService implements IKeyStoreService {
         certificatedto.setEndDate(endDate);
 
         certificateService.generateSelfSignedCertificate(certificatedto,true);
+    }
+
+    @Override
+    public List<Certificate> readAll() {
+       List<Certificate> returnlist =  keyStoreReader.readAllCertificates("./jks/intermediate.jks","intermediate".toCharArray());
+       for(Certificate c :  returnlist){
+           X509Certificate certificate = (X509Certificate)c;
+           boolean[] k = certificate.getKeyUsage();
+       }
+       return returnlist;
     }
 
 
