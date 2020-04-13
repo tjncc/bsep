@@ -49,6 +49,7 @@ public class CertificateController {
 
     @RequestMapping(method = RequestMethod.GET, value="/all")
     public ResponseEntity<List<CertificateDto>> getAll() {
+        //certificateService.findAll();
         return new ResponseEntity<>(certificateService.findAll(), HttpStatus.OK);
     }
 
@@ -97,7 +98,7 @@ public class CertificateController {
         LocalDate endDate = startDate.plusYears(10);
         certificateX509NameDto.setStartDate(startDate);
         certificateX509NameDto.setEndDate(endDate);
-        
+
         certificateService.generateSelfSignedCertificate(certificateX509NameDto,false);
         return new ResponseEntity<>(HttpStatus.OK);
     }

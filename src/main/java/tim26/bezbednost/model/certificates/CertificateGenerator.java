@@ -1,8 +1,7 @@
 package tim26.bezbednost.model.certificates;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -12,14 +11,21 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.springframework.security.web.savedrequest.Enumerator;
 import org.springframework.stereotype.Component;
+import tim26.bezbednost.dto.ExstensionsDto;
+import tim26.bezbednost.dto.ExtendedKeyUsageDto;
+import tim26.bezbednost.dto.KeyUsageDto;
 
+
+import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.security.*;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Date;
+import java.util.*;
 
 @Component
 public class  CertificateGenerator {
@@ -28,7 +34,7 @@ public class  CertificateGenerator {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData,boolean isCA) {
+    public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, boolean isCA, ExstensionsDto exstensionsDto) {
         try {
             //Posto klasa za generisanje sertifiakta ne moze da primi direktno privatni kljuc pravi se builder za objekat
             //Ovaj objekat sadrzi privatni kljuc izdavaoca sertifikata i koristiti se za potpisivanje sertifikata
@@ -51,7 +57,7 @@ public class  CertificateGenerator {
                     subjectData.getX500name(),
                     subjectData.getPublicKey());
             //Generise se sertifikat
-            X509CertificateHolder certHolder = certGen.build(contentSigner);
+
 
             BasicConstraints basicConstraints = new BasicConstraints(isCA);
             //true ako je CA
@@ -62,6 +68,43 @@ public class  CertificateGenerator {
             //Nakon toga je potrebno certHolder konvertovati u sertifikat, za sta se koristi certConverter
             JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
             certConverter = certConverter.setProvider("BC");
+
+            //key-usage & extended key-usage
+            if(exstensionsDto != null) {
+                if (exstensionsDto.getKeyUsageDto() != null) {
+
+                    List<Integer> checkKeyUsages = exstensionsDto.getKeyUsageDto().getAllNotNullValues();
+                    Optional<Integer> ret = checkKeyUsages.stream().reduce((a, b) -> a | b);
+                    KeyUsage keyUsage = new KeyUsage(ret.get());
+                    boolean isCritical = false;
+                    if (exstensionsDto.getKeyUsageDto().getIsCriticalKeyUsage() != null) {
+                        isCritical = true;
+                    }
+
+                    certGen.addExtension(Extension.keyUsage, isCritical, keyUsage);
+
+                }
+
+                if (exstensionsDto.getExtendedKeyUsageDto() != null) {
+
+                    ExtendedKeyUsageDto extended = exstensionsDto.getExtendedKeyUsageDto();
+                    boolean isCritical = false;
+                    if (extended.getIsCriticalExtendedKeyUsage() != null) {
+                        isCritical = true;
+                    }
+                    KeyPurposeId[] extendedUsages = extended.getKeyUsages();
+                    ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(extendedUsages);
+                    certGen.addExtension(Extension.extendedKeyUsage, isCritical, extendedKeyUsage);
+                }
+            }
+
+
+            X509CertificateHolder certHolder = certGen.build(contentSigner);
+
+
+            X509Certificate certificate = certConverter.getCertificate(certHolder);
+            Certificate certificate1 =  (Certificate)certificate;
+            System.out.println(certificate1);
 
             //Konvertuje objekat u sertifikat
             return certConverter.getCertificate(certHolder);

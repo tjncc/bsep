@@ -20,6 +20,7 @@ import org.bouncycastle.cert.jcajce.JcaX509CertificateHolder;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.springframework.stereotype.Component;
+import sun.security.krb5.internal.crypto.KeyUsage;
 import tim26.bezbednost.model.certificates.IssuerData;
 
 @Component
@@ -59,6 +60,7 @@ public class KeyStoreReader {
             keyStore.load(in, password);
             //Iscitava se sertifikat koji ima dati alias
             Certificate cert = keyStore.getCertificate(alias);
+
             //Iscitava se privatni kljuc vezan za javni kljuc koji se nalazi na sertifikatu sa datim aliasom
             PrivateKey privKey = (PrivateKey) keyStore.getKey(alias, keyPass);
 
@@ -88,6 +90,7 @@ public class KeyStoreReader {
             //kreiramo instancu KeyStore
 
             KeyStore ks = KeyStore.getInstance("JKS", "SUN");
+
             //ucitavamo podatke
             BufferedInputStream in = new BufferedInputStream(new FileInputStream(keyStoreFile));
             ks.load(in, keyStorePass.toCharArray());

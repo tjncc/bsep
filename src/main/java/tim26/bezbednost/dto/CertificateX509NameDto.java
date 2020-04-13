@@ -20,6 +20,7 @@ public class CertificateX509NameDto {
     private String issuerSerialNumber;
     private CertificateType subjectType;
     private String code;
+    private ExstensionsDto exstensionsDto;
 
     public CertificateX509NameDto() {
 
@@ -127,5 +128,13 @@ public class CertificateX509NameDto {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public ExstensionsDto getExstensionsDto() {
+        return exstensionsDto;
+    }
+
+    public void setExstensionsDto(ExstensionsDto exstensionsDto) {
+        this.exstensionsDto = exstensionsDto;
     }
 }
