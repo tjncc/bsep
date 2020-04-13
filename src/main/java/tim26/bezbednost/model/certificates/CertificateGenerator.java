@@ -69,21 +69,33 @@ public class  CertificateGenerator {
             JcaX509CertificateConverter certConverter = new JcaX509CertificateConverter();
             certConverter = certConverter.setProvider("BC");
 
-            //key-usage
-            if(exstensionsDto.getKeyUsageDto() != null) {
+            //key-usage & extended key-usage
+            if(exstensionsDto != null) {
+                if (exstensionsDto.getKeyUsageDto() != null) {
 
-                List<Integer> checkKeyUsages =  exstensionsDto.getKeyUsageDto().getAllNotNullValues();
-                Optional<Integer> ret = checkKeyUsages.stream().reduce((a, b)-> a | b);
-                KeyUsage keyUsage = new KeyUsage(ret.get());
-                certGen.addExtension(Extension.keyUsage,true,keyUsage);
+                    List<Integer> checkKeyUsages = exstensionsDto.getKeyUsageDto().getAllNotNullValues();
+                    Optional<Integer> ret = checkKeyUsages.stream().reduce((a, b) -> a | b);
+                    KeyUsage keyUsage = new KeyUsage(ret.get());
+                    boolean isCritical = false;
+                    if (exstensionsDto.getKeyUsageDto().getIsCriticalKeyUsage() != null) {
+                        isCritical = true;
+                    }
 
-            }
+                    certGen.addExtension(Extension.keyUsage, isCritical, keyUsage);
 
-            if(exstensionsDto.getExtendedKeyUsageDto() != null) {
-                ExtendedKeyUsageDto extended = exstensionsDto.getExtendedKeyUsageDto();
-                KeyPurposeId[] extendedUsages = extended.getKeyUsages();
-                ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(extendedUsages);
-                certGen.addExtension(Extension.extendedKeyUsage, extendedKeyUsageDTO.isCritical(), extendedKeyUsage);
+                }
+
+                if (exstensionsDto.getExtendedKeyUsageDto() != null) {
+
+                    ExtendedKeyUsageDto extended = exstensionsDto.getExtendedKeyUsageDto();
+                    boolean isCritical = false;
+                    if (extended.getIsCriticalExtendedKeyUsage() != null) {
+                        isCritical = true;
+                    }
+                    KeyPurposeId[] extendedUsages = extended.getKeyUsages();
+                    ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(extendedUsages);
+                    certGen.addExtension(Extension.extendedKeyUsage, isCritical, extendedKeyUsage);
+                }
             }
 
 
