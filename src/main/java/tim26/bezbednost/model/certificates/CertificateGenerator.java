@@ -1,9 +1,7 @@
 package tim26.bezbednost.model.certificates;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.KeyUsage;
+import org.bouncycastle.asn1.x509.*;
 import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.X509v3CertificateBuilder;
@@ -15,6 +13,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.springframework.security.web.savedrequest.Enumerator;
 import org.springframework.stereotype.Component;
+import tim26.bezbednost.dto.ExstensionsDto;
+import tim26.bezbednost.dto.ExtendedKeyUsageDto;
 import tim26.bezbednost.dto.KeyUsageDto;
 
 
@@ -34,7 +34,7 @@ public class  CertificateGenerator {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, boolean isCA, KeyUsageDto keyUsageDto) {
+    public X509Certificate generateCertificate(SubjectData subjectData, IssuerData issuerData, boolean isCA, ExstensionsDto exstensionsDto) {
         try {
             //Posto klasa za generisanje sertifiakta ne moze da primi direktno privatni kljuc pravi se builder za objekat
             //Ovaj objekat sadrzi privatni kljuc izdavaoca sertifikata i koristiti se za potpisivanje sertifikata
@@ -70,13 +70,20 @@ public class  CertificateGenerator {
             certConverter = certConverter.setProvider("BC");
 
             //key-usage
-            if(keyUsageDto != null) {
+            if(exstensionsDto.getKeyUsageDto() != null) {
 
-                List<Integer> checkKeyUsages =  keyUsageDto.getAllNotNullValues();
+                List<Integer> checkKeyUsages =  exstensionsDto.getKeyUsageDto().getAllNotNullValues();
                 Optional<Integer> ret = checkKeyUsages.stream().reduce((a, b)-> a | b);
                 KeyUsage keyUsage = new KeyUsage(ret.get());
                 certGen.addExtension(Extension.keyUsage,true,keyUsage);
 
+            }
+
+            if(exstensionsDto.getExtendedKeyUsageDto() != null) {
+                ExtendedKeyUsageDto extended = exstensionsDto.getExtendedKeyUsageDto();
+                KeyPurposeId[] extendedUsages = extended.getKeyUsages();
+                ExtendedKeyUsage extendedKeyUsage = new ExtendedKeyUsage(extendedUsages);
+                certGen.addExtension(Extension.extendedKeyUsage, extendedKeyUsageDTO.isCritical(), extendedKeyUsage);
             }
 
 
