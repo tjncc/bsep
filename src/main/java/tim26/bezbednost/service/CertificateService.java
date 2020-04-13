@@ -75,7 +75,7 @@ public class CertificateService implements ICertificateService {
             }
         }
 
-        keyStoreService.readAll();
+        //keyStoreService.readAll();
 
         return certificateDtos;
     }
