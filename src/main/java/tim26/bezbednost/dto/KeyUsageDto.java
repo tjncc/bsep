@@ -17,6 +17,7 @@ public class KeyUsageDto {
     private String nonRepudiation;
     private String encipherOnly;
     private String decipherOnly;
+    private String isCriticalKeyUsage;
 
     public KeyUsageDto(String digitalSignarute, String keyEncipherment, String dataEnicipherment, String keyAgreement, String keyCertSign, String crlSign, String nonRepudiation, String encipherOnly, String decipherOnly) {
         this.digitalSignarute = digitalSignarute;
@@ -28,6 +29,31 @@ public class KeyUsageDto {
         this.nonRepudiation = nonRepudiation;
         this.encipherOnly = encipherOnly;
         this.decipherOnly = decipherOnly;
+    }
+
+    public KeyUsageDto(String digitalSignarute, String keyEncipherment, String dataEnicipherment, String keyAgreement, String keyCertSign, String crlSign, String nonRepudiation, String encipherOnly, String decipherOnly, String isCriticalKeyUsage) {
+        this.digitalSignarute = digitalSignarute;
+        this.keyEncipherment = keyEncipherment;
+        this.dataEnicipherment = dataEnicipherment;
+        this.keyAgreement = keyAgreement;
+        this.keyCertSign = keyCertSign;
+        this.crlSign = crlSign;
+        this.nonRepudiation = nonRepudiation;
+        this.encipherOnly = encipherOnly;
+        this.decipherOnly = decipherOnly;
+        this.isCriticalKeyUsage = isCriticalKeyUsage;
+    }
+
+    public KeyUsageDto(){
+
+    }
+
+    public String getIsCriticalKeyUsage() {
+        return this.isCriticalKeyUsage;
+    }
+
+    public void setIsCriticalKeyUsage(String isCriticalKeyUsage) {
+        this.isCriticalKeyUsage = isCriticalKeyUsage;
     }
 
     public String getDigitalSignarute() {
