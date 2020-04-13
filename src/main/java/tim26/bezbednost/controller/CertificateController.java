@@ -49,7 +49,7 @@ public class CertificateController {
 
     @RequestMapping(method = RequestMethod.GET, value="/all")
     public ResponseEntity<List<CertificateDto>> getAll() {
-
+        //certificateService.findAll();
         return new ResponseEntity<>(certificateService.findAll(), HttpStatus.OK);
     }
 
