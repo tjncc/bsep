@@ -13,6 +13,7 @@ public class ExtendedKeyUsageDto {
     private String codeSigning;
     private String emailProtection;
     private String timeStamping;
+    private String isCriticalExtendedKeyUsage;
 
     public ExtendedKeyUsageDto(String serverAuth, String clientAuth, String codeSigning, String emailProtection, String timeStamping) {
         this.serverAuth = serverAuth;
@@ -20,6 +21,16 @@ public class ExtendedKeyUsageDto {
         this.codeSigning = codeSigning;
         this.emailProtection = emailProtection;
         this.timeStamping = timeStamping;
+    }
+
+    public ExtendedKeyUsageDto(){ }
+
+    public String getIsCriticalExtendedKeyUsage() {
+        return this.isCriticalExtendedKeyUsage;
+    }
+
+    public void setIsCriticalExtendedKeyUsage(String isCriticalExtendedKeyUsage) {
+        this.isCriticalExtendedKeyUsage = isCriticalExtendedKeyUsage;
     }
 
     public String getServerAuth() {
