@@ -10,6 +10,10 @@ public class ExstensionsDto {
         this.extendedKeyUsageDto = extendedKeyUsageDto;
     }
 
+    public ExstensionsDto() {
+    }
+
+
     public KeyUsageDto getKeyUsageDto() {
         return keyUsageDto;
     }
