@@ -80,11 +80,12 @@ public class  CertificateGenerator {
                         Optional<Integer> ret = checkKeyUsages.stream().reduce((a, b) -> a | b);
                     KeyUsage keyUsage = new KeyUsage(ret.get());
                     boolean isCritical = false;
-                    if (exstensionsDto.getKeyUsageDto().getIsCriticalKeyUsage() != null) {
+                    if (exstensionsDto.getKeyUsageDto().getIsCriticalKeyUsage() != "") {
                         isCritical = true;
                     }
 
                     certGen.addExtension(Extension.keyUsage, isCritical, keyUsage);
+                    }
 
                 }
 
@@ -92,7 +93,7 @@ public class  CertificateGenerator {
 
                     ExtendedKeyUsageDto extended = exstensionsDto.getExtendedKeyUsageDto();
                     boolean isCritical = false;
-                    if (extended.getIsCriticalExtendedKeyUsage() != null) {
+                    if (extended.getIsCriticalExtendedKeyUsage() != "") {
                         isCritical = true;
                     }
                     KeyPurposeId[] extendedUsages = extended.getKeyUsages();
