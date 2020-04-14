@@ -126,9 +126,8 @@ public class CertificateService implements ICertificateService {
         subjectData.setStartDate(startDate);
         subjectData.setEndDate(endDate);
 
-        SecureRandom randomNum = new SecureRandom();
-        int serialNum = randomNum.nextInt();
-        subjectData.setSerialNumber(String.valueOf(serialNum));
+        String serialNum = generateSerialNumber();
+        subjectData.setSerialNumber(serialNum);
 
         X500NameBuilder nameBuilder = new X500NameBuilder();
         nameBuilder.addRDN(BCStyle.O, certificateDto.getOrganization());
@@ -441,11 +440,11 @@ public class CertificateService implements ICertificateService {
     public String generateSerialNumber() {
 
         Random rand = new Random();
-        int serialNumber = rand.nextInt(10000);
+        int serialNumber = rand.nextInt(1000000);
         String stringSerialNumber = String.valueOf(serialNumber);
 
         while(certificateRepository.findBySerialNumber(stringSerialNumber) != null) {
-            serialNumber = rand.nextInt(10000);
+            serialNumber = rand.nextInt(1000000);
             stringSerialNumber = String.valueOf(serialNumber);
         }
 
