@@ -169,6 +169,12 @@ public class CertificateService implements ICertificateService {
         SubjectData subject = generateSubjectData(certificateX509NameDto);
         IssuerData issuer = generateIssuerData(certificateX509NameDto, subject.getPrivateKey());
 
+        List<Certificate> certs = getAllRoots();
+        if(certs.size() != 0){
+            return;
+        }
+
+
         X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true,certificateX509NameDto.getExstensionsDto());
         certificate.verify(subject.getPublicKey());
 
