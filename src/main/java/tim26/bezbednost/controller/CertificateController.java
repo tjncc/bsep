@@ -11,6 +11,7 @@ import tim26.bezbednost.model.enumeration.CertificateRole;
 import tim26.bezbednost.model.enumeration.CertificateType;
 import tim26.bezbednost.service.ICertificateService;
 
+import javax.websocket.server.PathParam;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -100,6 +101,16 @@ public class CertificateController {
 
         certificateService.generateSelfSignedCertificate(certificateX509NameDto,false);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value="/check/{serialnum}")
+    public ResponseEntity<String> checkValidity(@PathVariable String serialnum){
+         String status = certificateService.checkValidity(serialnum);
+         if(status != null) {
+             return new ResponseEntity<>(status, HttpStatus.OK);
+         } else {
+             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+         }
     }
 
 

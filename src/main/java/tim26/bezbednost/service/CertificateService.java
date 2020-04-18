@@ -469,6 +469,23 @@ public class CertificateService implements ICertificateService {
         }
     }
 
+    @Override
+    public String checkValidity(String serialNumber) {
+
+        Certificate certificate = certificateRepository.findBySerialNumber(serialNumber);
+
+        if(certificate == null){
+            return "Invalid serial number";
+        }
+
+        if(certificate.getCertificateStatus().equals(CertificateStatus.VALID)){
+            return "Valid";
+        } else if (certificate.getCertificateStatus().equals(CertificateStatus.REVOKED)){
+            return "Revoked";
+        }
+
+        return null;
+    }
 
 
 }

@@ -45,4 +45,6 @@ public interface ICertificateService {
     public List<CertificateDto> findAllRevoked();
 
     public void checkEndDate(Certificate certificate);
+
+    public String checkValidity(String serialNumber);
 }
