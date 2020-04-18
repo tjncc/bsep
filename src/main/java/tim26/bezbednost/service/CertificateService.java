@@ -3,6 +3,7 @@ package tim26.bezbednost.service;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
 import org.bouncycastle.util.encoders.Base64Encoder;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -434,7 +435,7 @@ public class CertificateService implements ICertificateService {
 
         FileOutputStream os = new FileOutputStream("./downloads/" + x509Certificate.getSerialNumber() + ".crt");
         os.write("-----BEGIN CERTIFICATE-----\n".getBytes());
-        os.write(Base64.getEncoder().encode(x509Certificate.getEncoded()));
+        os.write(x509Certificate.toString().getBytes());
         os.write("\n-----END CERTIFICATE-----\n".getBytes());
         os.close();
 
