@@ -19,8 +19,8 @@ import java.util.List;
 public interface IKeyStoreService {
 
     public List<X509Certificate> findKeyStoreCertificatesByRole(CertificateRole role);
-    public void saveCertificateToKeyStore(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role);
-    public void saveWhenKeyStoreIsGenerating(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role);
+    public void saveCertificateToKeyStore(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role,String password);
+    public void saveWhenKeyStoreIsGenerating(X509Certificate certificate, String alias, PrivateKey privateKey, CertificateRole role,String password);
     public void generateRootKeyStore() throws CertificateException, ParseException, NoSuchAlgorithmException, SignatureException, NoSuchProviderException, InvalidKeyException;
     public List<Certificate> readAll();
 }

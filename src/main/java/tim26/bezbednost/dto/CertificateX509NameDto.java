@@ -21,6 +21,7 @@ public class CertificateX509NameDto {
     private CertificateType subjectType;
     private String code;
     private ExstensionsDto exstensionsDto;
+    private byte[] password;
 
     public CertificateX509NameDto() {
 
@@ -136,5 +137,13 @@ public class CertificateX509NameDto {
 
     public void setExstensionsDto(ExstensionsDto exstensionsDto) {
         this.exstensionsDto = exstensionsDto;
+    }
+
+    public byte[] getPassword() {
+        return password;
+    }
+
+    public void setPassword(byte[] password) {
+        this.password = password;
     }
 }

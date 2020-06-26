@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import tim26.bezbednost.dto.CertificateDto;
 import tim26.bezbednost.dto.CertificateX509NameDto;
 import tim26.bezbednost.keystore.KeyStoreReader;
+import tim26.bezbednost.keystore.KeystoreConfig;
 import tim26.bezbednost.model.certificates.CertificateGenerator;
 import tim26.bezbednost.model.certificates.IssuerData;
 import tim26.bezbednost.model.certificates.SubjectData;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.*;
+
 
 @Service
 public class CertificateService implements ICertificateService {
@@ -174,14 +176,22 @@ public class CertificateService implements ICertificateService {
             return;
         }
 
+        //byte[] decodedI= java.util.Base64.getDecoder().decode("intermediate");
+        //byte[] decodedEE = java.util.Base64.getDecoder().decode("endentityJKS");
+
+
 
         X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer,true,certificateX509NameDto.getExstensionsDto());
         certificate.verify(subject.getPublicKey());
 
         if(isFirstTime) {
-            keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
+            if(certificateX509NameDto.getCertificateRole().equals(CertificateRole.ROOT)){
+                keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT, java.util.Base64.getEncoder().encodeToString(KeystoreConfig.ROOT_PASS));
+            }else {
+                keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT, java.util.Base64.getEncoder().encodeToString(certificateX509NameDto.getPassword()));
+            }
         } else {
-            keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT);
+            keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.ROOT,java.util.Base64.getEncoder().encodeToString(certificateX509NameDto.getPassword()));
         }
 
         int roots = 1;
@@ -269,6 +279,9 @@ public class CertificateService implements ICertificateService {
         SubjectData subject = generateSubjectData(certificateX509NameDto);
         List<Certificate> certificateDtoList = certificateRepository.findAll();
 
+        String root = java.util.Base64.getEncoder().encodeToString(KeystoreConfig.ROOT_PASS);
+
+
         for (Certificate c : certificateDtoList) {
             if (c.getSerialNumber().equals(alias) && c.getCertificateStatus().equals(CertificateStatus.VALID)) {
 
@@ -277,16 +290,16 @@ public class CertificateService implements ICertificateService {
                 if (c.getRole() == CertificateRole.ROOT) {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
-                            c.getSerialNumber(), "root".toCharArray(),
-                            "root".toCharArray());
+                            c.getSerialNumber(), java.util.Base64.getEncoder().encodeToString(KeystoreConfig.ROOT_PASS).toCharArray(),
+                            java.util.Base64.getEncoder().encodeToString(KeystoreConfig.ROOT_PASS).toCharArray());
 
                     X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true,certificateX509NameDto.getExstensionsDto());
 
 
                     if(isFirstTime){
-                        keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                        keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE,java.util.Base64.getEncoder().encodeToString(certificateX509NameDto.getPassword()));
                     } else{
-                        keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                        keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE,java.util.Base64.getEncoder().encodeToString(certificateX509NameDto.getPassword()));
                     }
 
                     if(certificateX509NameDto.getEndDate() == null){
@@ -298,15 +311,15 @@ public class CertificateService implements ICertificateService {
 
                     IssuerData issuer = keyStoreReader.readIssuerFromStore("./jks/intermediate.jks",
                             c.getSerialNumber(),
-                            "intermediate".toCharArray(),
-                            "intermediate".toCharArray());
+                            java.util.Base64.getEncoder().encodeToString(KeystoreConfig.INTERMEDIATE_PASS).toCharArray(),
+                            java.util.Base64.getEncoder().encodeToString(KeystoreConfig.INTERMEDIATE_PASS).toCharArray());
 
                     X509Certificate certificate = certificateGenerator.generateCertificate(subject, issuer, true,certificateX509NameDto.getExstensionsDto());
 
                     if(isFirstTime){
-                        keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                        keyStoreService.saveWhenKeyStoreIsGenerating(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE,java.util.Base64.getEncoder().encodeToString(certificateX509NameDto.getPassword()));
                     } else {
-                        keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE);
+                        keyStoreService.saveCertificateToKeyStore(certificate, subject.getSerialNumber(), issuer.getPrivateKey(), CertificateRole.INTERMEDIATE,java.util.Base64.getEncoder().encodeToString(certificateX509NameDto.getPassword()));
                     }
 
                     certificateRepository.save(new Certificate(subject.getSerialNumber(), CertificateRole.INTERMEDIATE, CertificateType.CA,certificateX509NameDto.getCommonName(), subject.getStartDate(), subject.getEndDate(), CertificateStatus.VALID,0,c.getCode() + c.getChildren()));
@@ -336,23 +349,23 @@ public class CertificateService implements ICertificateService {
                 try
                 {
                     issuer = keyStoreReader.readIssuerFromStore("./jks/root.jks",
-                            String.valueOf(c.getSerialNumber()), "root".toCharArray(),
-                            "root".toCharArray());
+                            String.valueOf(c.getSerialNumber()), java.util.Base64.getEncoder().encodeToString(KeystoreConfig.ROOT_PASS).toCharArray(),
+                            java.util.Base64.getEncoder().encodeToString(KeystoreConfig.ROOT_PASS).toCharArray());
                 }
                 catch (Exception e)
                 {
                     issuer = keyStoreReader.readIssuerFromStore("./jks/intermediate.jks",
-                            String.valueOf(c.getSerialNumber()), "intermediate".toCharArray(),
-                            "intermediate".toCharArray());
+                            String.valueOf(c.getSerialNumber()), java.util.Base64.getEncoder().encodeToString(KeystoreConfig.INTERMEDIATE_PASS).toCharArray(),
+                            java.util.Base64.getEncoder().encodeToString(KeystoreConfig.INTERMEDIATE_PASS).toCharArray());
                 }
 
                 returnc = certificateGenerator.generateCertificate(subject, issuer,false,certificatedto.getExstensionsDto());
 
 
                 if(isFristTime == false){
-                    keyStoreService.saveCertificateToKeyStore(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
+                    keyStoreService.saveCertificateToKeyStore(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole(),java.util.Base64.getEncoder().encodeToString(certificatedto.getPassword()));
                 } else {
-                    keyStoreService.saveWhenKeyStoreIsGenerating(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole());
+                    keyStoreService.saveWhenKeyStoreIsGenerating(returnc, subject.getSerialNumber(), issuer.getPrivateKey(), certificatedto.getCertificateRole(),java.util.Base64.getEncoder().encodeToString(certificatedto.getPassword()));
                 }
 
                 certificateRepository.save(new Certificate(subject.getSerialNumber(), certificatedto.getCertificateRole(), CertificateType.ENDENTITY,certificatedto.getCommonName(), subject.getStartDate(), subject.getEndDate(), CertificateStatus.VALID, 0, c.getCode() + c.getChildren()));
@@ -422,11 +435,11 @@ public class CertificateService implements ICertificateService {
         java.security.cert.Certificate certificate;
 
         if(certificateX509NameDto.getCertificateRole().equals(CertificateRole.ROOT)){
-            certificate = keyStoreReader.readCertificate("./jks/root.jks", "root", certificateX509NameDto.getSerialNumber());
+            certificate = keyStoreReader.readCertificate("./jks/root.jks", java.util.Base64.getEncoder().encodeToString(KeystoreConfig.ROOT_PASS), certificateX509NameDto.getSerialNumber());
         } else if (certificateX509NameDto.getCertificateRole().equals(CertificateRole.INTERMEDIATE)) {
-            certificate = keyStoreReader.readCertificate("./jks/intermediate.jks", "intermediate", certificateX509NameDto.getSerialNumber());
+            certificate = keyStoreReader.readCertificate("./jks/intermediate.jks", java.util.Base64.getEncoder().encodeToString(KeystoreConfig.INTERMEDIATE_PASS), certificateX509NameDto.getSerialNumber());
         } else if (certificateX509NameDto.getCertificateRole().equals(CertificateRole.ENDENTITY)) {
-            certificate = keyStoreReader.readCertificate("./jks/end-entity.jks", "end-entity", certificateX509NameDto.getSerialNumber());
+            certificate = keyStoreReader.readCertificate("./jks/end-entity.jks", java.util.Base64.getEncoder().encodeToString(KeystoreConfig.END_ENTITY_PASS), certificateX509NameDto.getSerialNumber());
         } else {
             return false;
         }
